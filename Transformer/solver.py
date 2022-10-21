@@ -4,9 +4,9 @@ import torch.nn.functional as F
 import numpy as np
 import os
 import time
-from utils.utils import *
-from model.AnomalyTransformer import AnomalyTransformer
-from data_factory.data_loader import get_loader_segment
+from Transformer.utils.utils import *
+from Transformer.model.AnomalyTransformer import AnomalyTransformer
+from Transformer.data_factory.data_loader import get_loader_segment
 
 
 def my_kl_loss(p, q):
