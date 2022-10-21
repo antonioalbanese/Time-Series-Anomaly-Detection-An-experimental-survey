@@ -15,7 +15,7 @@ class ADMethod():
 
 	def prepare_pipeline(self):
 		if self.method_name == 'transformer':
-			self.solver = Solver(vars(config))
+			self.solver = Solver(settings)
 
 
 	def train(self):
