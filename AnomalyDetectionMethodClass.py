@@ -2,9 +2,9 @@ import os
 import argparse
 
 from torch.backends import cudnn
-from transformer.utils.utils import *
+from Transformer.utils.utils import *
 
-from transformer.solver import Solver
+from Transformer.solver import Solver
 
 
 class ADMethod():
