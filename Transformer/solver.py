@@ -66,8 +66,22 @@ class Solver(object):
     DEFAULTS = {}
 
     def __init__(self, config):
+        self.config = config
+        # self.__dict__.update(Solver.DEFAULTS, **config)
+        self.lr = config['lr']
+        self.num_epochs = config['num_epochs']
+        self.k = config['k']
+        self.win_size = config['win_size']
+        self.input_c = config['input_c']
+        self.output_c = config['output_c']
+        self.batch_size = config['batch_size']
+        self.pretrained_model = config['pretrained_model']
+        self.dataset = config['dataset']
+        self.mode = config['mode']
+        self.data_path = config['data_path']
+        self.model_save_path = config['model_save_path']
+        self.anormly_ratio = config['anormly_ratio']
 
-        self.__dict__.update(Solver.DEFAULTS, **config)
 
         self.train_loader = get_loader_segment(self.data_path, batch_size=self.batch_size, win_size=self.win_size,
                                                mode='train',
