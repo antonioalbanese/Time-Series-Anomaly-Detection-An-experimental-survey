@@ -12,9 +12,10 @@ class Solver(object):
     def __init__(self, config, data_path):
         self.config = config
         self.data_path = data_path
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.dm = self.prepare_data(data_path)
         self.build_model()
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        
 
     def prepare_data(self, data_path):
         df = pd.read_csv(self.data_path, index_col = 'timestamp', parse_dates=['timestamp'])
