@@ -35,7 +35,7 @@ class Solver(object):
             mode = 'min'
             )
         self.mc.CHECKPOINT_NAME_LAST = f'DeepAnt-best-checkpoint'
-        self.trainer = pl.Trainer(max_epochs=self.config['EPOCHS'], accelerator = self.device, callbacks = self.mc)
+        self.trainer = pl.Trainer(max_epochs=self.config['EPOCHS'], accelerator = self.device.type, callbacks = self.mc)
 
     def train(self):
         self.trainer.fit(self.anomaly_detector, self.dm)
