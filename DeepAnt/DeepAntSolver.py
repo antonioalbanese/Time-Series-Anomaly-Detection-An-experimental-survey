@@ -12,7 +12,7 @@ class Solver(object):
     def __init__(self, config, data_path):
         self.config = config
         self.data_path = data_path
-        self.dm = prepare_data(data_path)
+        self.dm = self.prepare_data(data_path)
         self.build_model()
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
