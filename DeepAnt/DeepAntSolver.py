@@ -4,7 +4,7 @@ import torch
 from pytorch_lightning.callbacks import ModelCheckpoint
 from torchinfo import summary
 
-from DeepAnt.deepant import TrafficDataset, DeepAnt, AnomalyDetector
+from DeepAnt.deepant import TrafficDataset, DeepAnt, AnomalyDetector, DataModule
 
 class Solver(object):
     DEFAULTS = {}
