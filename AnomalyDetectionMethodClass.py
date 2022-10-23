@@ -18,7 +18,7 @@ class ADMethod():
 		if self.method_name == 'transformer':
 			self.solver = Transformer.Solver(self.settings)
 		if self.method_name == 'DeepAnt':
-			self.solver =  SeepAnt.Solver(self.settings, self.data_path)
+			self.solver =  DeepAnt.Solver(self.settings, self.data_path)
 
 
 	def train(self):
