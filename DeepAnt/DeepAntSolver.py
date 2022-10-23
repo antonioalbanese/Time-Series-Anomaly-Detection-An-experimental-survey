@@ -9,15 +9,15 @@ from DeepAnt.deepant import TrafficDataset, DeepAnt, AnomalyDetector
 class Solver(object):
     DEFAULTS = {}
 
-    def __init__(self, config):
+    def __init__(self, config, data_path):
         self.config = config
-        
+        self.data_path = data_path
         self.dm = prepare_dataset(data_path)
         self.build_model()
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     def prepare_data(self, data_path):
-        df = pd.read_csv(data_path, index_col = 'timestamp', parse_dates=['timestamp'])
+        df = pd.read_csv(self.data_path, index_col = 'timestamp', parse_dates=['timestamp'])
         self. dataset = TrafficDataset(df, self.config['SEQ_LEN'])
         dm = DataModule(df, self.config['SEQ_LEN'])
         return dm
