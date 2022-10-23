@@ -4,7 +4,8 @@ import argparse
 from torch.backends import cudnn
 from Transformer.utils.utils import *
 
-from Transformer.solver import Solver
+from Transformer import *
+from DeepAnt import * 
 
 
 class ADMethod():
@@ -15,16 +16,21 @@ class ADMethod():
 
 	def prepare_pipeline(self):
 		if self.method_name == 'transformer':
-			self.solver = Solver(self.settings)
+			self.solver = Transformer.Solver(self.settings)
+		if self.method_name == 'DeepAnt':
+			self.solver =  SeepAnt.Solver(self.settings, self.data_path)
 
 
 	def train(self):
 		if self.method_name == 'transformer':
 			self.solver.train()
-
+		if self.method_name == 'DeepAnt':
+			self.solver.train()
 
 	def test(self):
 		if self.method_name == 'transformer':
+			self.solver.test()
+		if self.method_name == 'DeepAnt':
 			self.solver.test()
 
 	def results(self):
