@@ -41,6 +41,6 @@ class Solver(object):
         self.trainer.fit(self.anomaly_detector, self.dm)
     
     def test(self):
-        output = self.trainer.predict(self.anomaly_detector, dm)
+        output = self.trainer.predict(self.anomaly_detector, self.dm)
         ## TODO: look at what it does return
         return output
