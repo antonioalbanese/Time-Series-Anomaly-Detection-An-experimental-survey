@@ -42,5 +42,6 @@ class Solver(object):
     
     def test(self):
         output = self.trainer.predict(self.anomaly_detector, self.dm)
+        print(output)
         ## TODO: look at what it does return
         return output
