@@ -3,6 +3,7 @@ import pytorch_lightning as pl
 import torch
 from pytorch_lightning.callbacks import ModelCheckpoint
 from torchinfo import summary
+import torch.nn as nn
 
 from DeepAnt.deepant import TrafficDataset, DeepAnt, AnomalyDetector, DataModule
 
@@ -26,19 +27,25 @@ class Solver(object):
     def build_model(self):
         self.model = DeepAnt(self.config['SEQ_LEN'], self.config['out_dim'])
         self.anomaly_detector = AnomalyDetector(self.model)
-        self.mc = ModelCheckpoint(
-            dirpath = 'checkpoints',
-            save_last = True,
-            save_top_k = 1,
-            verbose = True,
-            monitor = 'train_loss', 
-            mode = 'min'
-            )
-        self.mc.CHECKPOINT_NAME_LAST = f'DeepAnt-best-checkpoint'
-        self.trainer = pl.Trainer(max_epochs=self.config['EPOCHS'], accelerator = self.device.type, callbacks = self.mc)
+        self.criterion = nn.L1Loss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr = 1e-5)
 
     def train(self):
-        self.trainer.fit(self.anomaly_detector, self.dm)
+        loss_list = []
+        self.model.train()
+        self.model.to(self.device)
+        for epoch in range(self.config["EPOCHS"]):
+            curr_loss = 0
+            for batch in self.dm:
+                input = batch.to(self.device)
+                output = self.model(input)
+                loss = self.criterion(output, input)
+                curr_loss += loss.item()
+                loss.backward()
+                self.optimizer.step()
+            loss_list.append(curr_loss)
+        print(f"Epoch {epoch}: loss:{curr_loss}")
+        return loss_list
     
     def test(self):
         output = self.trainer.predict(self.anomaly_detector, self.dm)
