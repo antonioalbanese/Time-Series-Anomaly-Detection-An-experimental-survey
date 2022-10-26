@@ -4,6 +4,7 @@ import torch
 from pytorch_lightning.callbacks import ModelCheckpoint
 from torchinfo import summary
 import torch.nn as nn
+from torch.utils.data import DataLoader
 
 from DeepAnt.deepant import TrafficDataset, DeepAnt, AnomalyDetector, DataModule
 
@@ -14,15 +15,15 @@ class Solver(object):
         self.config = config
         self.data_path = data_path
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.dm = self.prepare_data(data_path)
+        self.prepare_data(data_path)
         self.build_model()
         
 
     def prepare_data(self, data_path):
         df = pd.read_csv(self.data_path, index_col = 'timestamp', parse_dates=['timestamp'])
-        self. dataset = TrafficDataset(df, self.config['SEQ_LEN'])
-        dm = DataModule(df, self.config['SEQ_LEN'])
-        return dm
+        self.dataset = TrafficDataset(df, self.config['SEQ_LEN'])
+        self.train_dl = DataLoader(self.dataset, batch_size = 32, num_workers = 10, pin_memory = True, shuffle = True)
+        self.test_dl = DataLoader(self.dataset, batch_size = 1, num_workers = 10, pin_memory = True, shuffle = False)
 
     def build_model(self):
         self.model = DeepAnt(self.config['SEQ_LEN'], self.config['out_dim'])

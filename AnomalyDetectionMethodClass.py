@@ -25,7 +25,8 @@ class ADMethod():
 		if self.method_name == 'transformer':
 			self.solver.train()
 		if self.method_name == 'DeepAnt':
-			self.solver.train()
+			l = self.solver.train()
+			return l
 
 	def test(self):
 		if self.method_name == 'transformer':
