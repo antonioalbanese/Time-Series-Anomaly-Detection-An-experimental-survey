@@ -38,14 +38,13 @@ class Solver(object):
         for epoch in range(self.config["EPOCHS"]):
             curr_loss = 0
             for i,batch in enumerate(self.train_dl):
-                print(f"batch {i}")
                 input = batch[0].to(self.device)
                 output = self.model(input)
                 loss = self.criterion(output, input)
                 curr_loss += loss.item()
                 loss.backward()
                 self.optimizer.step()
-            loss_list.append(curr_loss)
+            loss_list.append(curr_loss/len(self.train_dl))
         print(f"Epoch {epoch}: loss:{curr_loss}")
         return loss_list
     
