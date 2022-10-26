@@ -37,7 +37,8 @@ class Solver(object):
         self.model.to(self.device)
         for epoch in range(self.config["EPOCHS"]):
             curr_loss = 0
-            for batch in self.train_dl:
+            for i,batch in enumerate(self.train_dl):
+                print(f"batch {i}")
                 input = batch[0].to(self.device)
                 output = self.model(input)
                 loss = self.criterion(output, input)
