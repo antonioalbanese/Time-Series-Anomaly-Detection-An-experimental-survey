@@ -39,7 +39,7 @@ class Solver(object):
             curr_loss = 0
             for i,batch in enumerate(self.train_dl):
                 print(batch)
-                print(batch.shape)
+                print(len(batch))
                 print(batch[0].size())
                 input = batch[0].to(self.device)
                 output = self.model(input)
