@@ -32,7 +32,8 @@ class ADMethod():
 		if self.method_name == 'transformer':
 			self.solver.test()
 		if self.method_name == 'DeepAnt':
-			self.solver.test()
+			p, l = self.solver.test()
+			return p, l
 
 	def results(self):
 		pass
