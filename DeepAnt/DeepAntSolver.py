@@ -38,6 +38,9 @@ class Solver(object):
         for epoch in range(self.config["EPOCHS"]):
             curr_loss = 0
             for i,batch in enumerate(self.train_dl):
+                print(batch)
+                print(batch.shape)
+                print(batch[0].size())
                 input = batch[0].to(self.device)
                 output = self.model(input)
                 loss = self.criterion(output, input)
@@ -49,6 +52,12 @@ class Solver(object):
         return loss_list
     
     def test(self):
-        output = self.trainer.predict(self.anomaly_detector, self.dm)
-        o = output.copy()
+        self.model.eval()
+        loss_list = []
+        predictions = []
+        for i, batch in enumerate(self.test_dl):
+            input = batch[0].to(self.device)
+            output = self.model(input)
+            predictions.append(output.item())
+            loss = torch.linalg.norm(output-input)
         return o
