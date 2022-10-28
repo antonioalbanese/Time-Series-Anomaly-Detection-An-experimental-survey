@@ -1,4 +1,4 @@
-from LSTMmodel import RNNPredictor
+from LSTMEncoderDecoder.LSTMmodel import RNNPredictor
 class Solver(object):
     DEFAULTS = {}
 
