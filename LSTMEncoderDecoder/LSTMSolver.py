@@ -42,18 +42,18 @@ class Solver(object):
     def train(self):
         with torch.enable_grad():
             # Turn on training mode which enables dropout.
-            model.train()
+            self.model.train()
             total_loss = 0
             start_time = time.time()
-            hidden = model.init_hidden(self.config['BATCH_SIZE'])
+            hidden = self.model.init_hidden(self.config['BATCH_SIZE'])
             for k, batch in enumerate(self.train_dl):
                 inputSeq = batch[0].permute(1,0,-1).to(self.device)
                 targetSeq = batch[1].permute(1,0,-1).to(self.device)
 
                 # Starting each batch, we detach the hidden state from how it was previously produced.
                 # If we didn't, the model would try backpropagating all the way to start of the dataset.
-                hidden = model.repackage_hidden(hidden)
-                hidden_ = model.repackage_hidden(hidden)
+                hidden = self.model.repackage_hidden(hidden)
+                hidden_ = self.model.repackage_hidden(hidden)
                 optimizer.zero_grad()
 
                 '''Loss1: Free running loss'''
@@ -61,7 +61,7 @@ class Solver(object):
                 outVals=[]
                 hids1 = []
                 for i in range(inputSeq.size(0)):
-                    outVal, hidden_, hid = model.forward(outVal, hidden_,return_hiddens=True)
+                    outVal, hidden_, hid = self.model.forward(outVal, hidden_,return_hiddens=True)
                     outVals.append(outVal)
                     hids1.append(hid)
                 outSeq1 = torch.cat(outVals,dim=0)
@@ -69,7 +69,7 @@ class Solver(object):
                 loss1 = criterion(outSeq1.view(self.config['BATCH_SIZE'],-1), targetSeq.view(self.config['BATCH_SIZE'],-1))
 
                 '''Loss2: Teacher forcing loss'''
-                outSeq2, hidden, hids2 = model.forward(inputSeq, hidden, return_hiddens=True)
+                outSeq2, hidden, hids2 = self.model.forward(inputSeq, hidden, return_hiddens=True)
                 loss2 = criterion(outSeq2.view(self.config['BATCH_SIZE'], -1), targetSeq.view(self.config['BATCH_SIZE'], -1))
 
                 '''Loss3: Simplified Professor forcing loss'''
@@ -80,7 +80,7 @@ class Solver(object):
                 loss.backward()
 
                 # `clip_grad_norm` helps prevent the exploding gradient problem in RNNs / LSTMs.
-                torch.nn.utils.clip_grad_norm_(model.parameters(), self.config['CLIP'])
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config['CLIP'])
                 optimizer.step()
 
                 total_loss += loss.item()
