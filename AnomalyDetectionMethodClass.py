@@ -8,6 +8,7 @@ from Transformer import TransformerSolver
 from DeepAnt import DeepAntSolver
 
 
+
 class ADMethod():
 	def __init__(self, method_name:str, settings: dict, data_path: str):
 		self.method_name = method_name
@@ -19,6 +20,8 @@ class ADMethod():
 			self.solver = TransformerSolver.Solver(self.settings)
 		if self.method_name == 'DeepAnt':
 			self.solver =  DeepAntSolver.Solver(self.settings, self.data_path)
+		if self.method_name == 'LSTM':
+			self.solver =  LSTMSolver.Solver(self.settings, self.data_path)
 
 
 	def train(self):
@@ -27,6 +30,8 @@ class ADMethod():
 		if self.method_name == 'DeepAnt':
 			l = self.solver.train()
 			return l
+		if self.method_name == 'LSTM':
+			self.solver.train()
 
 	def test(self):
 		if self.method_name == 'transformer':
