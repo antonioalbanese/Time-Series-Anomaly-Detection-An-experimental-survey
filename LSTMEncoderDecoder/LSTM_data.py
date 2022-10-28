@@ -29,7 +29,7 @@ class LSTMDataset(Dataset):
             
         return np.array(sequence), np.array(label), np.array(timestamp)
     
-   ef __len__(self):
+    def __len__(self):
         return len(self.df) - self.seq_len -1
     
     def __getitem__(self, idx):
