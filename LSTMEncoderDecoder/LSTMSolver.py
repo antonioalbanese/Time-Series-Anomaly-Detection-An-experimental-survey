@@ -44,7 +44,6 @@ class Solver(object):
             # Turn on training mode which enables dropout.
             self.model.train()
             total_loss = 0
-            start_time = time.time()
             hidden = self.model.init_hidden(self.config['BATCH_SIZE'])
             for k, batch in enumerate(self.train_dl):
                 inputSeq = batch[0].permute(1,0,-1).to(self.device)
@@ -87,13 +86,13 @@ class Solver(object):
 
                 if batch % self.config['LOG_INTERVAL'] == 0 and batch > 0:
                     cur_loss = total_loss / self.config['LOG_INTERVAL']
-                    elapsed = time.time() - start_time
+                    # elapsed = time.time() - start_time
                     print('| epoch {:3d} | {:5d}/{:5d} batches | ms/batch {:5.4f} | '
                         'loss {:5.2f} '.format(
                         epoch, batch, len(train_dataset) // self.config['SEQ_LEN'],
                                     elapsed * 1000 / self.config['LOG_INTERVAL'], cur_loss))
                     total_loss = 0
-                    start_time = time.time()
+                    # start_time = time.time()
     
     def test(self):
         self.model.eval()
