@@ -6,7 +6,7 @@ from Transformer.utils.utils import *
 
 from Transformer import TransformerSolver
 from DeepAnt import DeepAntSolver
-
+from LSTMEncoderDecoder import LSTMSolver
 
 
 class ADMethod():
