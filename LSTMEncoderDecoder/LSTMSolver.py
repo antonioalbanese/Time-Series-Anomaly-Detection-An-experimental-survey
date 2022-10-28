@@ -1,3 +1,4 @@
+import torch
 from LSTMEncoderDecoder.LSTMmodel import RNNPredictor
 class Solver(object):
     DEFAULTS = {}
