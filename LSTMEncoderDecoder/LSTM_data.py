@@ -7,6 +7,7 @@ import numpy as np
 from pathlib import Path
 import pickle
 from torch.utils.data import Dataset
+from sklearn.preprocessing import MinMaxScaler
 
 class LSTMDataset(Dataset):
     def __init__(self, df, seq_len):
