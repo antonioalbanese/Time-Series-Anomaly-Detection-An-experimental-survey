@@ -53,7 +53,7 @@ class Solver(object):
                 # If we didn't, the model would try backpropagating all the way to start of the dataset.
                 hidden = self.model.repackage_hidden(hidden)
                 hidden_ = self.model.repackage_hidden(hidden)
-                optimizer.zero_grad()
+                self.optimizer.zero_grad()
 
                 '''Loss1: Free running loss'''
                 outVal = inputSeq[0].unsqueeze(0)
@@ -80,7 +80,7 @@ class Solver(object):
 
                 # `clip_grad_norm` helps prevent the exploding gradient problem in RNNs / LSTMs.
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config['CLIP'])
-                optimizer.step()
+                self.optimizer.step()
 
                 total_loss += loss.item()
 
