@@ -101,7 +101,7 @@ class Solver(object):
                         # start_time = time.time()
                 
                 print('-' * 89)
-                print('| end of epoch {:3d} | time: {:5.2f}s | '.format(epoch, (time.time() - epoch_start_time)))
+                print('| end of epoch {:3d}'.format(epoch))
                 print('-' * 89)
     
     def test(self):
