@@ -46,7 +46,7 @@ class Solver(object):
             total_loss = 0
             hidden = self.model.init_hidden(self.config['BATCH_SIZE'])
             for epoch in range(self.config["EPOCHS"]):
-                epoch_start_time = time.time()
+                # epoch_start_time = time.time()
                 
                 for k, batch in enumerate(self.train_dl):
                     inputSeq = batch[0].permute(1,0,-1).to(self.device)
