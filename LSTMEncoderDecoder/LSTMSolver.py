@@ -93,10 +93,7 @@ class Solver(object):
                     if k % self.config['LOG_INTERVAL'] == 0 and k > 0:
                         cur_loss = total_loss / self.config['LOG_INTERVAL']
                         # elapsed = time.time() - start_time
-                        print('| epoch {:3d} | {:5d}/{:5d} batches | ms/batch {:5.4f} | '
-                            'loss {:5.2f} '.format(
-                            epoch, k, len(train_dataset) // self.config['SEQ_LEN'],
-                                        elapsed * 1000 / self.config['LOG_INTERVAL'], cur_loss))
+                        print('| epoch {:3d} | {:5d}/{:5d} batches | loss {:5.2f} '.format(epoch, k, len(self.dataset) // self.config['SEQ_LEN'], cur_loss))
                         total_loss = 0
                         # start_time = time.time()
                 
