@@ -65,14 +65,17 @@ class Solver(object):
                     hids1.append(hid)
                 outSeq1 = torch.cat(outVals,dim=0)
                 hids1 = torch.cat(hids1,dim=0)
-                loss1 = self.criterion(outSeq1.view(self.config['BATCH_SIZE'],-1), targetSeq.view(self.config['BATCH_SIZE'],-1))
+                # loss1 = self.criterion(outSeq1.view(self.config['BATCH_SIZE'],-1), targetSeq.view(self.config['BATCH_SIZE'],-1))
+                loss1 = self.criterion(outSeq1, targetSeq)
 
                 '''Loss2: Teacher forcing loss'''
                 outSeq2, hidden, hids2 = self.model.forward(inputSeq, hidden, return_hiddens=True)
-                loss2 = self.criterion(outSeq2.view(self.config['BATCH_SIZE'], -1), targetSeq.view(self.config['BATCH_SIZE'], -1))
+                # loss2 = self.criterion(outSeq2.view(self.config['BATCH_SIZE'], -1), targetSeq.view(self.config['BATCH_SIZE'], -1))
+                loss2 = self.criterion(outSeq2, targetSeq)
 
                 '''Loss3: Simplified Professor forcing loss'''
-                loss3 = self.criterion(hids1.view(self.config['BATCH_SIZE'],-1), hids2.view(self.config['BATCH_SIZE'],-1).detach())
+                # loss3 = self.criterion(hids1.view(self.config['BATCH_SIZE'],-1), hids2.view(self.config['BATCH_SIZE'],-1).detach())
+                loss3 = self.criterion(hids1, hids2.detach())
 
                 '''Total loss = Loss1+Loss2+Loss3'''
                 loss = loss1+loss2+loss3
