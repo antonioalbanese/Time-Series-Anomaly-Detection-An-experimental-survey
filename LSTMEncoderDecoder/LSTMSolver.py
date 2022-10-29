@@ -87,7 +87,7 @@ class Solver(object):
 
                 total_loss += loss.item()
 
-                if batch % self.config['LOG_INTERVAL'] == 0 and batch > 0:
+                if k % self.config['LOG_INTERVAL'] == 0 and batch > 0:
                     cur_loss = total_loss / self.config['LOG_INTERVAL']
                     # elapsed = time.time() - start_time
                     print('| epoch {:3d} | {:5d}/{:5d} batches | ms/batch {:5.4f} | '
