@@ -45,57 +45,64 @@ class Solver(object):
             self.model.train()
             total_loss = 0
             hidden = self.model.init_hidden(self.config['BATCH_SIZE'])
-            for k, batch in enumerate(self.train_dl):
-                inputSeq = batch[0].permute(1,0,-1).to(self.device)
-                targetSeq = batch[1].permute(1,0,-1).to(self.device)
+            for epoch in range(self.config["EPOCHS"]):
+                epoch_start_time = time.time()
+                
+                for k, batch in enumerate(self.train_dl):
+                    inputSeq = batch[0].permute(1,0,-1).to(self.device)
+                    targetSeq = batch[1].permute(1,0,-1).to(self.device)
 
-                # Starting each batch, we detach the hidden state from how it was previously produced.
-                # If we didn't, the model would try backpropagating all the way to start of the dataset.
-                hidden = self.model.repackage_hidden(hidden)
-                hidden_ = self.model.repackage_hidden(hidden)
-                self.optimizer.zero_grad()
+                    # Starting each batch, we detach the hidden state from how it was previously produced.
+                    # If we didn't, the model would try backpropagating all the way to start of the dataset.
+                    hidden = self.model.repackage_hidden(hidden)
+                    hidden_ = self.model.repackage_hidden(hidden)
+                    self.optimizer.zero_grad()
 
-                '''Loss1: Free running loss'''
-                outVal = inputSeq[0].unsqueeze(0)
-                outVals=[]
-                hids1 = []
-                for i in range(inputSeq.size(0)):
-                    outVal, hidden_, hid = self.model.forward(outVal, hidden_,return_hiddens=True)
-                    outVals.append(outVal)
-                    hids1.append(hid)
-                outSeq1 = torch.cat(outVals,dim=0)
-                hids1 = torch.cat(hids1,dim=0)
-                # loss1 = self.criterion(outSeq1.view(self.config['BATCH_SIZE'],-1), targetSeq.view(self.config['BATCH_SIZE'],-1))
-                loss1 = self.criterion(outSeq1, targetSeq)
+                    '''Loss1: Free running loss'''
+                    outVal = inputSeq[0].unsqueeze(0)
+                    outVals=[]
+                    hids1 = []
+                    for i in range(inputSeq.size(0)):
+                        outVal, hidden_, hid = self.model.forward(outVal, hidden_,return_hiddens=True)
+                        outVals.append(outVal)
+                        hids1.append(hid)
+                    outSeq1 = torch.cat(outVals,dim=0)
+                    hids1 = torch.cat(hids1,dim=0)
+                    # loss1 = self.criterion(outSeq1.view(self.config['BATCH_SIZE'],-1), targetSeq.view(self.config['BATCH_SIZE'],-1))
+                    loss1 = self.criterion(outSeq1, targetSeq)
 
-                '''Loss2: Teacher forcing loss'''
-                outSeq2, hidden, hids2 = self.model.forward(inputSeq, hidden, return_hiddens=True)
-                # loss2 = self.criterion(outSeq2.view(self.config['BATCH_SIZE'], -1), targetSeq.view(self.config['BATCH_SIZE'], -1))
-                loss2 = self.criterion(outSeq2, targetSeq)
+                    '''Loss2: Teacher forcing loss'''
+                    outSeq2, hidden, hids2 = self.model.forward(inputSeq, hidden, return_hiddens=True)
+                    # loss2 = self.criterion(outSeq2.view(self.config['BATCH_SIZE'], -1), targetSeq.view(self.config['BATCH_SIZE'], -1))
+                    loss2 = self.criterion(outSeq2, targetSeq)
 
-                '''Loss3: Simplified Professor forcing loss'''
-                # loss3 = self.criterion(hids1.view(self.config['BATCH_SIZE'],-1), hids2.view(self.config['BATCH_SIZE'],-1).detach())
-                loss3 = self.criterion(hids1, hids2.detach())
+                    '''Loss3: Simplified Professor forcing loss'''
+                    # loss3 = self.criterion(hids1.view(self.config['BATCH_SIZE'],-1), hids2.view(self.config['BATCH_SIZE'],-1).detach())
+                    loss3 = self.criterion(hids1, hids2.detach())
 
-                '''Total loss = Loss1+Loss2+Loss3'''
-                loss = loss1+loss2+loss3
-                loss.backward()
+                    '''Total loss = Loss1+Loss2+Loss3'''
+                    loss = loss1+loss2+loss3
+                    loss.backward()
 
-                # `clip_grad_norm` helps prevent the exploding gradient problem in RNNs / LSTMs.
-                torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config['CLIP'])
-                self.optimizer.step()
+                    # `clip_grad_norm` helps prevent the exploding gradient problem in RNNs / LSTMs.
+                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config['CLIP'])
+                    self.optimizer.step()
 
-                total_loss += loss.item()
+                    total_loss += loss.item()
 
-                if k % self.config['LOG_INTERVAL'] == 0 and k > 0:
-                    cur_loss = total_loss / self.config['LOG_INTERVAL']
-                    # elapsed = time.time() - start_time
-                    print('| epoch {:3d} | {:5d}/{:5d} batches | ms/batch {:5.4f} | '
-                        'loss {:5.2f} '.format(
-                        epoch, k, len(train_dataset) // self.config['SEQ_LEN'],
-                                    elapsed * 1000 / self.config['LOG_INTERVAL'], cur_loss))
-                    total_loss = 0
-                    # start_time = time.time()
+                    if k % self.config['LOG_INTERVAL'] == 0 and k > 0:
+                        cur_loss = total_loss / self.config['LOG_INTERVAL']
+                        # elapsed = time.time() - start_time
+                        print('| epoch {:3d} | {:5d}/{:5d} batches | ms/batch {:5.4f} | '
+                            'loss {:5.2f} '.format(
+                            epoch, k, len(train_dataset) // self.config['SEQ_LEN'],
+                                        elapsed * 1000 / self.config['LOG_INTERVAL'], cur_loss))
+                        total_loss = 0
+                        # start_time = time.time()
+                
+                print('-' * 89)
+                print('| end of epoch {:3d} | time: {:5.2f}s | '.format(epoch, (time.time() - epoch_start_time)))
+                print('-' * 89)
     
     def test(self):
         self.model.eval()
