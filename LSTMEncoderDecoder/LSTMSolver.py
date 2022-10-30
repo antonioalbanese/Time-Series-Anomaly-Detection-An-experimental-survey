@@ -5,6 +5,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from LSTMEncoderDecoder.LSTMmodel import RNNPredictor
 from LSTMEncoderDecoder.LSTM_data import LSTMDataset
+from torchsummary import summary
 class Solver(object):
     DEFAULTS = {}
 
@@ -37,7 +38,7 @@ class Solver(object):
                                           lr = self.config['LR'], 
                                           weight_decay=self.config['WEIGHT_DECAY'])
         
-
+        summary(self.model)
 
     def train(self):
         with torch.enable_grad():
