@@ -38,7 +38,7 @@ class Solver(object):
                                           lr = self.config['LR'], 
                                           weight_decay=self.config['WEIGHT_DECAY'])
         
-        summary(self.model)
+        summary(self.model, (10,32,1))
 
     def train(self):
         with torch.enable_grad():
