@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
-import pytorch_lightning as pl
+# import pytorch_lightning as pl
 
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader, Dataset
@@ -36,19 +36,19 @@ class TrafficDataset(Dataset):
         return (torch.tensor(self.sequence[idx], dtype = torch.float).permute(1, 0), 
                 torch.tensor(self.labels[idx], dtype = torch.float))
 
-class DataModule(pl.LightningDataModule):
-    def __init__(self, df, seq_len):
-        super().__init__()
-        self.df = df
-        self.seq_len = seq_len
-    def setup(self, stage=None):
-        self.dataset = TrafficDataset(self.df, self.seq_len)
+# class DataModule(pl.LightningDataModule):
+#     def __init__(self, df, seq_len):
+#         super().__init__()
+#         self.df = df
+#         self.seq_len = seq_len
+#     def setup(self, stage=None):
+#         self.dataset = TrafficDataset(self.df, self.seq_len)
         
-    def train_dataloader(self):
-        return DataLoader(self.dataset, batch_size = 32, num_workers = 10, pin_memory = True, shuffle = True)
+#     def train_dataloader(self):
+#         return DataLoader(self.dataset, batch_size = 32, num_workers = 10, pin_memory = True, shuffle = True)
     
-    def predict_dataloader(self):
-        return DataLoader(self.dataset, batch_size = 1, num_workers = 10, pin_memory = True, shuffle = False)
+#     def predict_dataloader(self):
+#         return DataLoader(self.dataset, batch_size = 1, num_workers = 10, pin_memory = True, shuffle = False)
 
 
 class DeepAnt(nn.Module):
@@ -86,25 +86,25 @@ class DeepAnt(nn.Module):
         return x
 
 
-class AnomalyDetector(pl.LightningModule):
-    def __init__(self, model):
-        super().__init__()
-        self.model = model
-        self.criterion = nn.L1Loss()
-    def forward(self, x):
-        return self.model(x)
+# class AnomalyDetector(pl.LightningModule):
+#     def __init__(self, model):
+#         super().__init__()
+#         self.model = model
+#         self.criterion = nn.L1Loss()
+#     def forward(self, x):
+#         return self.model(x)
     
-    def training_step(self, batch, batch_idx):
-        x, y = batch
-        y_pred = self(x)
-        loss = self.criterion(y_pred, y)
-        self.log('train_loss', loss, prog_bar=True, logger = True)
-        return loss
-    def predict_step(self, batch, batch_idx):
-        x, y = batch
-        y_pred = self(x)
-        return y_pred, torch.linalg.norm(y_pred-y)
+#     def training_step(self, batch, batch_idx):
+#         x, y = batch
+#         y_pred = self(x)
+#         loss = self.criterion(y_pred, y)
+#         self.log('train_loss', loss, prog_bar=True, logger = True)
+#         return loss
+#     def predict_step(self, batch, batch_idx):
+#         x, y = batch
+#         y_pred = self(x)
+#         return y_pred, torch.linalg.norm(y_pred-y)
     
-    def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr = 1e-5)
+#     def configure_optimizers(self):
+#         return torch.optim.Adam(self.parameters(), lr = 1e-5)
     
