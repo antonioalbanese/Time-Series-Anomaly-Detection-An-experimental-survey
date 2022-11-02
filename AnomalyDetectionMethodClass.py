@@ -41,6 +41,10 @@ class ADMethod():
 		if self.method_name == 'DeepAnt':
 			p, l = self.solver.test()
 			return p, l
+		if self.method_name == 'USAD':
+			r = self.solver.test()
+			return r
+
 
 	def results(self):
 		pass

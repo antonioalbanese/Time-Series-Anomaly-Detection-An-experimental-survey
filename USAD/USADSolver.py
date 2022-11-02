@@ -112,7 +112,7 @@ class USADSolver(object):
     
     
 
-    def test(alpha=.5, beta=.5):
+    def test(self, alpha=.5, beta=.5):
         results=[]
         for [batch] in self.test_loader:
             batch= batch.to(self.device)
