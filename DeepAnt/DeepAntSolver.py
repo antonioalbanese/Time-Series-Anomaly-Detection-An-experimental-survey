@@ -2,7 +2,7 @@ import pandas as pd
 # import pytorch_lightning as pl
 import torch
 # from pytorch_lightning.callbacks import ModelCheckpoint
-from torchinfo import summary
+# from torchinfo import summary
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
