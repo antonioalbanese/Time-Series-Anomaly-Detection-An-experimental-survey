@@ -1,11 +1,10 @@
 import pandas as pd
 import torch
-from torchinfo import summary
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from LSTMEncoderDecoder.LSTMmodel import RNNPredictor
 from LSTMEncoderDecoder.LSTM_data import LSTMDataset
-from torchsummary import summary
+
 class Solver(object):
     DEFAULTS = {}
 
