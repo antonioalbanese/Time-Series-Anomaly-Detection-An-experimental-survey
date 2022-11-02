@@ -15,10 +15,10 @@ class USADSolver(object):
 
     def __init__(self, config):
         self.config = config
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.prepare_data()
         self.build_model()
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.criterion = nn.MSELoss()
+        
     
     def prepare_data(self):
         ### load train data
