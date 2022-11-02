@@ -100,7 +100,7 @@ class USADSolver(object):
                 optimizer2.zero_grad()
                 
                 
-            result = evaluate(epoch+1)
+            result = self.evaluate(epoch+1)
             model.epoch_end(epoch, result)
             history.append(result)
         return history
