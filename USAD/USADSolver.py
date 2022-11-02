@@ -105,7 +105,7 @@ class USADSolver(object):
                 
                 
             result = self.evaluate(epoch+1)
-            model.epoch_end(epoch, result)
+            self.model.epoch_end(epoch, result)
             history.append(result)
         return history
     
