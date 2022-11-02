@@ -7,6 +7,7 @@ from Transformer.utils.utils import *
 from Transformer import TransformerSolver
 from DeepAnt import DeepAntSolver
 from LSTMEncoderDecoder import LSTMSolver
+from USAD import USADSolver
 
 
 class ADMethod():
@@ -17,11 +18,11 @@ class ADMethod():
 
 	def prepare_pipeline(self):
 		if self.method_name == 'transformer':
-			self.solver = TransformerSolver.Solver(self.settings)
+			self.solver = TransformerSolver.TransformerSolver(self.settings)
 		if self.method_name == 'DeepAnt':
-			self.solver =  DeepAntSolver.Solver(self.settings, self.data_path)
-		if self.method_name == 'LSTM':
-			self.solver =  LSTMSolver.Solver(self.settings, self.data_path)
+			self.solver =  DeepAntSolver.DeepAntSolver(self.settings, self.data_path)
+		if self.method_name == 'USAD':
+			self.solver =  USADSolver.USADSolver(self.settings)
 
 
 	def train(self):
@@ -30,7 +31,7 @@ class ADMethod():
 		if self.method_name == 'DeepAnt':
 			l = self.solver.train()
 			return l
-		if self.method_name == 'LSTM':
+		if self.method_name == 'USAD':
 			self.solver.train()
 
 	def test(self):
