@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from DeepAnt.deepant import TrafficDataset, DeepAnt, AnomalyDetector, DataModule
+from DeepAnt.deepant import TrafficDataset, DeepAnt
 
 class DeepAntSolver(object):
     DEFAULTS = {}
