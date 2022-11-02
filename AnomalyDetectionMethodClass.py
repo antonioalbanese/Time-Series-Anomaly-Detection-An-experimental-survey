@@ -32,7 +32,8 @@ class ADMethod():
 			l = self.solver.train()
 			return l
 		if self.method_name == 'USAD':
-			self.solver.train()
+			h = self.solver.train()
+			return h
 
 	def test(self):
 		if self.method_name == 'transformer':
