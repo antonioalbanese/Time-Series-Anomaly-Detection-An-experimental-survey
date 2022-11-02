@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 
 from DeepAnt.deepant import TrafficDataset, DeepAnt, AnomalyDetector, DataModule
 
-class Solver(object):
+class DeepAntSolver(object):
     DEFAULTS = {}
 
     def __init__(self, config, data_path):

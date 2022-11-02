@@ -62,7 +62,7 @@ class EarlyStopping:
         self.val_loss2_min = val_loss2
 
 
-class Solver(object):
+class TransformerSolver(object):
     DEFAULTS = {}
 
     def __init__(self, config):
