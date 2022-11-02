@@ -78,6 +78,7 @@ class USADSolver(object):
         self.model = UsadModel(self.w_size, self.z_size).to(self.device)
 
     def train(self):
+        opt_func=torch.optim.Adam
         history = []
         optimizer1 = opt_func(list(self.model.encoder.parameters())+list(self.model.decoder1.parameters()))
         optimizer2 = opt_func(list(self.model.encoder.parameters())+list(self.model.decoder2.parameters()))
