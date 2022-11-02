@@ -77,10 +77,10 @@ class USADSolver(object):
     def build_model(self):
         self.model = UsadModel(self.w_size, self.z_size).to(self.device)
 
-    def evaluate(n):
+    def evaluate(self,n):
         outputs = [self.model.validation_step(batch.to(self.device), n) for [batch] in self.val_loader]
         return self.model.validation_epoch_end(outputs)
-        
+
     def train(self):
         opt_func=torch.optim.Adam
         history = []
