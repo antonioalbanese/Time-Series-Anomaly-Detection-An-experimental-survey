@@ -59,6 +59,12 @@ class USADSolver(object):
         windows_normal_train = windows_normal[:int(np.floor(.8 *  windows_normal.shape[0]))]
         windows_normal_val = windows_normal[int(np.floor(.8 *  windows_normal.shape[0])):int(np.floor(windows_normal.shape[0]))]
 
+        windows_labels=[]
+        for i in range(len(labels)-window_size):
+            windows_labels.append(list(np.int_(labels[i:i+window_size])))
+        y_test = [1.0 if (np.sum(window) > 0) else 0 for window in windows_labels ]
+        self.test_labels = y_test
+
         self.train_loader = torch.utils.data.DataLoader(data_utils.TensorDataset(
             torch.from_numpy(windows_normal_train).float().view(([windows_normal_train.shape[0],w_size]))
         ) , batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
