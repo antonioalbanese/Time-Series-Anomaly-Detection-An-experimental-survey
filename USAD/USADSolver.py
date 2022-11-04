@@ -128,7 +128,7 @@ class USADSolver(object):
             w1=self.model.decoder1(self.model.encoder(batch)).to('cpu')
             w2=self.model.decoder2(self.model.encoder(w1.to(self.device))).to('cpu')
             print(w1.device, w2.device)
-            results.append((alpha*torch.mean((batch-w1)**2,axis=1)+beta*torch.mean((batch-w2)**2,axis=1)).to('cpu'))
+            results.append((alpha*torch.mean((batch.to('cpu')-w1)**2,axis=1)+beta*torch.mean((batch.to('cpu')-w2)**2,axis=1)).to('cpu'))
         r = results
         y_pred=np.concatenate([torch.stack(r[:-1]).flatten().detach().cpu().numpy(),
                               r[-1].flatten().detach().cpu().numpy()])
