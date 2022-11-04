@@ -142,7 +142,7 @@ class USADSolver(object):
             else:
                 y_pred_norm[i] = 0
         print("Test ended")
-        print(classification_report(np.array(method.solver.test_labels), y_pred_norm))
-        report = classification_report(np.array(method.solver.test_labels), y_pred_norm, output_dict=True)
+        print(classification_report(np.array(self.test_labels), y_pred_norm))
+        report = classification_report(np.array(self.test_labels), y_pred_norm, output_dict=True)
         return r, report
         
