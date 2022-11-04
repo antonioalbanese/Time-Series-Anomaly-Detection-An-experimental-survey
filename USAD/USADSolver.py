@@ -79,6 +79,8 @@ class USADSolver(object):
             self.test_loader = torch.utils.data.DataLoader(data_utils.TensorDataset(
                 torch.from_numpy(windows_attack).float().view(([windows_attack.shape[0],w_size]))
             ) , batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
+        elif self.config['DATASET'] == 'MSL':
+            pass
 
 
 
@@ -144,5 +146,5 @@ class USADSolver(object):
         print("Test ended")
         print(classification_report(np.array(self.test_labels), y_pred_norm))
         report = classification_report(np.array(self.test_labels), y_pred_norm, output_dict=True)
-        return r, report
+        return y_pred, report
         
