@@ -42,8 +42,8 @@ class ADMethod():
 			p, l = self.solver.test()
 			return p, l
 		if self.method_name == 'USAD':
-			r = self.solver.test(alpha = self.settings['ALPHA'], beta = self.settings['BETA'])
-			return r
+			self.anomaly_scores, self.classification_report = self.solver.test(alpha = self.settings['ALPHA'], beta = self.settings['BETA'])
+			return self.anomaly_scores, self.classification_report
 
 
 	def results(self):
