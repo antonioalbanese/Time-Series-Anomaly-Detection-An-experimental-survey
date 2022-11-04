@@ -5,6 +5,8 @@ import numpy as np
 import os
 import time
 from sklearn import preprocessing
+from sklearn.metrics import classification_report
+import sklearn
 import torch.utils.data as data_utils
 from USAD.usad import *
 
@@ -122,7 +124,24 @@ class USADSolver(object):
         results=[]
         for [batch] in self.test_loader:
             batch= batch.to(self.device)
-            w1=self.model.decoder1(self.model.encoder(batch))
-            w2=self.model.decoder2(self.model.encoder(w1))
-            results.append(alpha*torch.mean((batch-w1)**2,axis=1)+beta*torch.mean((batch-w2)**2,axis=1))
-        return results
+            w1=self.model.decoder1(self.model.encoder(batch)).to('cpu')
+            w2=self.model.decoder2(self.model.encoder(w1.to(self.device))).to('cpu')
+            results.append((alpha*torch.mean((batch-w1)**2,axis=1)+beta*torch.mean((batch-w2)**2,axis=1)).to('cpu'))
+        r = results
+        y_pred=np.concatenate([torch.stack(r[:-1]).flatten().detach().cpu().numpy(),
+                              r[-1].flatten().detach().cpu().numpy()])
+
+        scal = sklearn.preprocessing.MinMaxScaler()
+        y_pred_norm = scal.fit_transform(y_pred.reshape(-1, 1)).reshape(-1)
+
+
+        for i,el in enumerate(y_pred_norm):
+            if el >= self.config['confidence']:
+                y_pred_norm[i] = 1
+            else:
+                y_pred_norm[i] = 0
+        print("Test ended")
+        print(classification_report(np.array(method.solver.test_labels), y_pred_norm))
+        report = classification_report(np.array(method.solver.test_labels), y_pred_norm, output_dict=True)
+        return r, report
+        

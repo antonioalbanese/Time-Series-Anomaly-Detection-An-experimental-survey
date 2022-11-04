@@ -42,7 +42,7 @@ class ADMethod():
 			p, l = self.solver.test()
 			return p, l
 		if self.method_name == 'USAD':
-			r = self.solver.test()
+			r = self.solver.test(alpha = self.settings['ALPHA'], beta = self.settings['BETA'])
 			return r
 
 
