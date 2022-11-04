@@ -23,7 +23,7 @@ class USADSolver(object):
         
     
     def prepare_data(self):
-        if self.config['DATASET'] == SWAT:
+        if self.config['DATASET'] == 'SWAT':
             ### load train data
             train_data = pd.read_csv("input/SWaT_Dataset_Normal_v1.csv")
             train_data = train_data.drop(["Timestamp" , "Normal/Attack" ] , axis = 1)
