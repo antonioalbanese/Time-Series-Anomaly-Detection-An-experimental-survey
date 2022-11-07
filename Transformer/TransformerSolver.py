@@ -153,9 +153,9 @@ class TransformerSolver(object):
         early_stopping = EarlyStopping(patience=3, verbose=True, dataset_name=self.dataset)
         train_steps = len(self.train_loader)
         history = {
-            train_loss: [], 
-            val_loss1:[],
-            val_loss2:[]
+            'train_loss': [], 
+            'val_loss1':[],
+            'val_loss2':[]
         }
 
         for epoch in range(self.num_epochs):
