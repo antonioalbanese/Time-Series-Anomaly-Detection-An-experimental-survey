@@ -8,6 +8,7 @@ from Transformer.utils.utils import *
 from Transformer.model.AnomalyTransformer import AnomalyTransformer
 from Transformer.data_factory.data_loader import get_loader_segment
 from sklearn.metrics import classification_report
+import sklearn
 
 
 def my_kl_loss(p, q):
