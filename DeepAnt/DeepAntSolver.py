@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader
 
 from DeepAnt.deepant import TrafficDataset, DeepAnt
 from sklearn.metrics import classification_report
+import sklearn
 
 class DeepAntSolver(object):
     DEFAULTS = {}
