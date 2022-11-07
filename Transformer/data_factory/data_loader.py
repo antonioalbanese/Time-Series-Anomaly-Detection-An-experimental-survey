@@ -38,8 +38,8 @@ class PSMSegLoader(object):
 
         self.test_labels = pd.read_csv(data_path + '/test_label.csv').values[:, 1:]
 
-        print("test:", self.test.shape)
-        print("train:", self.train.shape)
+        # print("test:", self.test.shape)
+        # print("train:", self.train.shape)
 
     def __len__(self):
         """
@@ -84,8 +84,8 @@ class MSLSegLoader(object):
         self.train = data
         self.val = self.test
         self.test_labels = np.load(data_path + "/MSL_test_label.npy")
-        print("test:", self.test.shape)
-        print("train:", self.train.shape)
+        # print("test:", self.test.shape)
+        # print("train:", self.train.shape)
 
     def __len__(self):
 
@@ -128,8 +128,8 @@ class SMAPSegLoader(object):
         self.train = data
         self.val = self.test
         self.test_labels = np.load(data_path + "/SMAP_test_label.npy")
-        print("test:", self.test.shape)
-        print("train:", self.train.shape)
+        # print("test:", self.test.shape)
+        # print("train:", self.train.shape)
 
     def __len__(self):
 
