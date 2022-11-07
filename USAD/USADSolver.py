@@ -124,27 +124,28 @@ class USADSolver(object):
     
 
     def test(self, alpha=.5, beta=.5):
-        results=[]
-        for [batch] in self.test_loader:
-            batch= batch.to(self.device)
-            w1=self.model.decoder1(self.model.encoder(batch)).to('cpu')
-            w2=self.model.decoder2(self.model.encoder(w1.to(self.device))).to('cpu')
-            results.append((alpha*torch.mean((batch.to('cpu')-w1)**2,axis=1)+beta*torch.mean((batch.to('cpu')-w2)**2,axis=1)).to('cpu'))
-        r = results
-        y_pred=np.concatenate([torch.stack(r[:-1]).flatten().detach().cpu().numpy(),
-                              r[-1].flatten().detach().cpu().numpy()])
+        with torch.no_grad():
+            results=[]
+            for [batch] in self.test_loader:
+                batch= batch.to(self.device)
+                w1=self.model.decoder1(self.model.encoder(batch)).to('cpu')
+                w2=self.model.decoder2(self.model.encoder(w1.to(self.device))).to('cpu')
+                results.append((alpha*torch.mean((batch.to('cpu')-w1)**2,axis=1)+beta*torch.mean((batch.to('cpu')-w2)**2,axis=1)).to('cpu'))
+            r = results
+            y_pred=np.concatenate([torch.stack(r[:-1]).flatten().detach().cpu().numpy(),
+                                r[-1].flatten().detach().cpu().numpy()])
 
-        scal = sklearn.preprocessing.MinMaxScaler()
-        y_pred_norm = scal.fit_transform(y_pred.reshape(-1, 1)).reshape(-1)
+            scal = sklearn.preprocessing.MinMaxScaler()
+            y_pred_norm = scal.fit_transform(y_pred.reshape(-1, 1)).reshape(-1)
 
 
-        for i,el in enumerate(y_pred_norm):
-            if el >= self.config['CONFIDENCE']:
-                y_pred_norm[i] = 1
-            else:
-                y_pred_norm[i] = 0
-        print("Test ended")
-        print(classification_report(np.array(self.test_labels), y_pred_norm))
-        report = classification_report(np.array(self.test_labels), y_pred_norm, output_dict=True)
-        return y_pred, report
+            for i,el in enumerate(y_pred_norm):
+                if el >= self.config['CONFIDENCE']:
+                    y_pred_norm[i] = 1
+                else:
+                    y_pred_norm[i] = 0
+            print("Test ended")
+            print(classification_report(np.array(self.test_labels), y_pred_norm))
+            report = classification_report(np.array(self.test_labels), y_pred_norm, output_dict=True)
+            return y_pred, report
         
