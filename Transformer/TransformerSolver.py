@@ -7,6 +7,7 @@ import time
 from Transformer.utils.utils import *
 from Transformer.model.AnomalyTransformer import AnomalyTransformer
 from Transformer.data_factory.data_loader import get_loader_segment
+from sklearn.metrics import classification_report
 
 
 def my_kl_loss(p, q):
@@ -151,6 +152,11 @@ class TransformerSolver(object):
             os.makedirs(path)
         early_stopping = EarlyStopping(patience=3, verbose=True, dataset_name=self.dataset)
         train_steps = len(self.train_loader)
+        history = {
+            train_loss: [], 
+            val_loss1:[],
+            val_loss2:[]
+        }
 
         for epoch in range(self.num_epochs):
             iter_count = 0
@@ -209,6 +215,10 @@ class TransformerSolver(object):
 
             vali_loss1, vali_loss2 = self.vali(self.test_loader)
 
+            history['train_loss'].append(train_loss.item())
+            history['val_loss1'].append(vali_loss1.item())
+            history['val_loss2'].append(vali_loss2.item())
+
             print(
                 "Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} ".format(
                     epoch + 1, train_steps, train_loss, vali_loss1))
@@ -217,6 +227,8 @@ class TransformerSolver(object):
                 print("Early stopping")
                 break
             adjust_learning_rate(self.optimizer, epoch + 1, self.lr)
+            
+        return history
 
     def test(self):
         self.model.load_state_dict(
@@ -376,14 +388,22 @@ class TransformerSolver(object):
         print("pred: ", pred.shape)
         print("gt:   ", gt.shape)
 
-        from sklearn.metrics import precision_recall_fscore_support
-        from sklearn.metrics import accuracy_score
-        accuracy = accuracy_score(gt, pred)
-        precision, recall, f_score, support = precision_recall_fscore_support(gt, pred,
-                                                                              average='binary')
-        print(
-            "Accuracy : {:0.4f}, Precision : {:0.4f}, Recall : {:0.4f}, F-score : {:0.4f} ".format(
-                accuracy, precision,
-                recall, f_score))
+        # from sklearn.metrics import precision_recall_fscore_support
+        # from sklearn.metrics import accuracy_score
+        # accuracy = accuracy_score(gt, pred)
+        # precision, recall, f_score, support = precision_recall_fscore_support(gt, pred,
+        #                                                                       average='binary')
+        # print(
+        #     "Accuracy : {:0.4f}, Precision : {:0.4f}, Recall : {:0.4f}, F-score : {:0.4f} ".format(
+        #         accuracy, precision,
+        #         recall, f_score))
 
-        return accuracy, precision, recall, f_score
+        for i,el in enumerate(losses):
+                if el >= self.config['CONFIDENCE']:
+                    losses[i] = 1
+                else:
+                    losses[i] = 0
+        
+        report = classification_report(gt, pred, output_dict=True)
+
+        return  test_energy, report

@@ -7,6 +7,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from DeepAnt.deepant import TrafficDataset, DeepAnt
+from sklearn.metrics import classification_report
 
 class DeepAntSolver(object):
     DEFAULTS = {}
@@ -62,4 +63,15 @@ class DeepAntSolver(object):
             predictions.append(output.item())
             loss = torch.linalg.norm(output-y)
             loss_list.append(loss.detach().item())
-        return predictions, loss_list
+        
+        sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
+        losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
+
+        for i,el in enumerate(losses):
+                if el >= self.config['CONFIDENCE']:
+                    losses[i] = 1
+                else:
+                    losses[i] = 0
+        
+        report = classification_report(np.array(self.test_labels), y_pred_norm, output_dict=True)
+        return generated_signal, losses, report

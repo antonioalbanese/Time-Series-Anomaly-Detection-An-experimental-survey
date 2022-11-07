@@ -37,14 +37,13 @@ class ADMethod():
 
 	def test(self):
 		if self.method_name == 'transformer':
-			self.solver.test()
+			self.anomaly_scores, self.classification_report = self.solver.test()
+
 		if self.method_name == 'DeepAnt':
-			p, l = self.solver.test()
-			return p, l
+			gen_sig, self.anomaly_scores, self.classification_report = self.solver.test()
+
 		if self.method_name == 'USAD':
 			self.anomaly_scores, self.classification_report = self.solver.test(alpha = self.settings['ALPHA'], beta = self.settings['BETA'])
-			return self.anomaly_scores, self.classification_report
-
-
-	def results(self):
-		pass
+		
+		
+		return self.anomaly_scores, self.classification_report
