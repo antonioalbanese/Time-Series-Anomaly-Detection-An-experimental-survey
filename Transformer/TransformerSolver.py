@@ -385,8 +385,8 @@ class TransformerSolver(object):
 
         pred = np.array(pred)
         gt = np.array(gt)
-        print("pred: ", pred.shape)
-        print("gt:   ", gt.shape)
+        # print("pred: ", pred.shape)
+        # print("gt:   ", gt.shape)
 
         # from sklearn.metrics import precision_recall_fscore_support
         # from sklearn.metrics import accuracy_score
@@ -398,12 +398,6 @@ class TransformerSolver(object):
         #         accuracy, precision,
         #         recall, f_score))
 
-        for i,el in enumerate(losses):
-                if el >= self.config['CONFIDENCE']:
-                    losses[i] = 1
-                else:
-                    losses[i] = 0
-        
         report = classification_report(gt, pred, output_dict=True)
 
         return  test_energy, report
