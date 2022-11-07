@@ -47,7 +47,7 @@ class DeepAntSolver(object):
                 loss.backward()
                 self.optimizer.step()
             loss_list.append(curr_loss/len(self.train_dl))
-        print(f"Epoch {epoch}: loss:{curr_loss}")
+            print(f"Epoch {epoch}: loss:{curr_loss}")
         return loss_list
     
     def test(self):
