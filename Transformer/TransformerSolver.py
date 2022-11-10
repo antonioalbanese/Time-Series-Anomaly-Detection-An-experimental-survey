@@ -142,7 +142,7 @@ class TransformerSolver(object):
 
                 if (i + 1) % 100 == 0:
                     speed = (time.time() - time_now) / iter_count
-                    left_time = speed * ((self.num_epochs - epoch) * train_steps - i)
+                    left_time = speed * ((self.config['EPOCHS'] - epoch) * train_steps - i)
                     print('\tspeed: {:.4f}s/iter; left time: {:.4f}s'.format(speed, left_time))
                     iter_count = 0
                     time_now = time.time()
