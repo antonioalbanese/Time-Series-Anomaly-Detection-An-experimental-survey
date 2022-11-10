@@ -31,7 +31,7 @@ class TransformerSolver(object):
         # self.output_c = config['output_c']
         # self.batch_size = config['batch_size']
         # self.pretrained_model = config['pretrained_model']
-        # self.dataset = config['dataset']
+        self.dataset = config['DATASET']
         # self.mode = config['mode']
         self.data_path = config['data_path']
         # self.model_save_path = config['model_save_path']
