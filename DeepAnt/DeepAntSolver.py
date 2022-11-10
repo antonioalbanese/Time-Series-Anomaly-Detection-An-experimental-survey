@@ -10,6 +10,7 @@ import numpy as np
 from DeepAnt.deepant import TrafficDataset, DeepAnt
 from sklearn.metrics import classification_report
 import sklearn
+import json
 
 class DeepAntSolver(object):
     DEFAULTS = {}
@@ -68,17 +69,30 @@ class DeepAntSolver(object):
         
         sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
         losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
-        print(losses.shape)
         for i,el in enumerate(losses):
                 if el >= self.config['CONFIDENCE']:
                     losses[i] = 1
                 else:
                     losses[i] = 0
-        true_labels = load_true_labels(self.data_path)
-        report = classification_report(arr_lbl, losses, output_dict=True)
+        true_labels = load_true_labels(self.data_path, losses.shape[0])
+        report = classification_report(true_labels, losses, output_dict=True)
         return generated_signal, losses, report
 
 
-def load_true_labels(data_path):
-    with open("./NAB/") as FI:
-            j_label = json.load(FI)
+def load_true_labels(data_path, len):
+    with open("./NAB/combined_windows.json") as FI:
+        j_label = json.load(FI)
+    key = data_path.split("./NAB/")[-1]
+    windows = j_label[key]
+
+    df = pd.read_csv(data_path)
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    y = np.zeros(len(df))
+    for w in windows:
+        start = pd.to_datetime(w[0])
+        end = pd.to_datetime(w[1])
+        for idx in df.index:
+            if df.loc[idx, 'timestamp'] >= start and df.loc[idx, 'timestamp'] <= end:
+                y[idx] = 1.0
+
+    return y[:len]
