@@ -5,6 +5,7 @@ import torch
 # from torchinfo import summary
 import torch.nn as nn
 from torch.utils.data import DataLoader
+import numpy as np
 
 from DeepAnt.deepant import TrafficDataset, DeepAnt
 from sklearn.metrics import classification_report
