@@ -57,7 +57,6 @@ class DeepAntSolver(object):
         self.model.eval()
         loss_list = []
         predictions = []
-        labels = []
         for i, batch in enumerate(self.test_dl):
             input, y = batch
             input = input.to(self.device)
@@ -68,16 +67,19 @@ class DeepAntSolver(object):
             loss_list.append(loss.detach().item())
             labels.append(y)
         
-        arr_lbl = np.array([item.cpu().numpy() for item in labels])
-        arr_lbl = arr_lbl.reshape(-1,)
         sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
         losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
-
+        print(losses.shape)
         for i,el in enumerate(losses):
                 if el >= self.config['CONFIDENCE']:
                     losses[i] = 1
                 else:
                     losses[i] = 0
-        print(arr_lbl, losses)
+        true_labels = load_true_labels(self.data_path)
         report = classification_report(arr_lbl, losses, output_dict=True)
         return generated_signal, losses, report
+
+
+def load_true_labels(data_path):
+    with open("./NAB/") as FI:
+            j_label = json.load(FI)
