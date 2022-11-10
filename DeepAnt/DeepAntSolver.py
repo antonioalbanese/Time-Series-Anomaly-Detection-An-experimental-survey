@@ -78,6 +78,6 @@ class DeepAntSolver(object):
                     losses[i] = 1
                 else:
                     losses[i] = 0
-        
+        print(arr_lbl, losses)
         report = classification_report(arr_lbl, losses, output_dict=True)
         return generated_signal, losses, report
