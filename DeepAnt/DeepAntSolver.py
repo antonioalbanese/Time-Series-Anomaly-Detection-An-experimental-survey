@@ -68,7 +68,7 @@ class DeepAntSolver(object):
             loss_list.append(loss.detach().item())
             labels.append(y)
         
-        arr_lbl = np.array([item.numpy() for item in labels])
+        arr_lbl = np.array([item.cpu().numpy() for item in labels])
         arr_lbl = arr_lbl.reshape(-1,)
         sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
         losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
