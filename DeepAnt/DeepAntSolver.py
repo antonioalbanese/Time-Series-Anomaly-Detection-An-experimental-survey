@@ -69,14 +69,17 @@ class DeepAntSolver(object):
         
         sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
         losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
-        for i,el in enumerate(losses):
-                if el >= self.config['CONFIDENCE']:
-                    losses[i] = 1
-                else:
-                    losses[i] = 0
         true_labels = load_true_labels(self.data_path, losses.shape[0])
-        report = classification_report(true_labels, losses, output_dict=True)
-        return predictions, losses, report
+        reports = []
+        for th in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+            for i,el in enumerate(losses):
+                    if el >= self.config['CONFIDENCE']:
+                        losses[i] = 1
+                    else:
+                        losses[i] = 0
+            report = classification_report(true_labels, losses, output_dict=True)
+            reports.append(report)
+        return predictions, losses, reports
 
 
 def load_true_labels(data_path, l):
