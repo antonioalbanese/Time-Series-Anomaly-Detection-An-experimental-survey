@@ -68,6 +68,8 @@ class DeepAntSolver(object):
             loss_list.append(loss.detach().item())
             labels.append(y)
         
+        arr_lbl = np.array([item.numpy() for item in labels])
+        arr_lbl = arr_lbl.reshape(-1,)
         sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
         losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
 
@@ -77,5 +79,5 @@ class DeepAntSolver(object):
                 else:
                     losses[i] = 0
         
-        report = classification_report(np.array(self.test_labels), y_pred_norm, output_dict=True)
+        report = classification_report(arr_lbl, y_pred_norm, output_dict=True)
         return generated_signal, losses, report
