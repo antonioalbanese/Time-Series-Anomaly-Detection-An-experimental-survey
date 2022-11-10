@@ -69,24 +69,24 @@ class TransformerSolver(object):
             for u in range(len(prior)):
                 series_loss += (torch.mean(my_kl_loss(series[u], (
                         prior[u] / torch.unsqueeze(torch.sum(prior[u], dim=-1), dim=-1).repeat(1, 1, 1,
-                                                                                               self.win_size)).detach())) + torch.mean(
+                                                                                               self.config['SEQ_LEN'])).detach())) + torch.mean(
                     my_kl_loss(
                         (prior[u] / torch.unsqueeze(torch.sum(prior[u], dim=-1), dim=-1).repeat(1, 1, 1,
-                                                                                                self.win_size)).detach(),
+                                                                                                self.config['SEQ_LEN'])).detach(),
                         series[u])))
                 prior_loss += (torch.mean(
                     my_kl_loss((prior[u] / torch.unsqueeze(torch.sum(prior[u], dim=-1), dim=-1).repeat(1, 1, 1,
-                                                                                                       self.win_size)),
+                                                                                                       self.config['SEQ_LEN'])),
                                series[u].detach())) + torch.mean(
                     my_kl_loss(series[u].detach(),
                                (prior[u] / torch.unsqueeze(torch.sum(prior[u], dim=-1), dim=-1).repeat(1, 1, 1,
-                                                                                                       self.win_size)))))
+                                                                                                       self.config['SEQ_LEN'])))))
             series_loss = series_loss / len(prior)
             prior_loss = prior_loss / len(prior)
 
             rec_loss = self.criterion(output, input)
-            loss_1.append((rec_loss - self.k * series_loss).item())
-            loss_2.append((rec_loss + self.k * prior_loss).item())
+            loss_1.append((rec_loss - self.config['K'] * series_loss).item())
+            loss_2.append((rec_loss + self.config['K'] * prior_loss).item())
 
         return np.average(loss_1), np.average(loss_2)
 
