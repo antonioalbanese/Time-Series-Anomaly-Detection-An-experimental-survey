@@ -22,6 +22,7 @@ class TransformerSolver(object):
 
     def __init__(self, config):
         self.config = config
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         # self.__dict__.update(Solver.DEFAULTS, **config)
         # self.lr = config['lr']
         # self.num_epochs = config['num_epochs']
@@ -44,7 +45,7 @@ class TransformerSolver(object):
                                                                                             dataset=self.dataset)
 
         self.build_model()
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        
         self.criterion = nn.MSELoss()
 
     def build_model(self):
