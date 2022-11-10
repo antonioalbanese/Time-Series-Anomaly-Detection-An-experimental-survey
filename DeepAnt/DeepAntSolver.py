@@ -51,7 +51,8 @@ class DeepAntSolver(object):
                 loss.backward()
                 self.optimizer.step()
             loss_list.append(curr_loss/len(self.train_dl))
-            print(f"Epoch {epoch}: loss:{curr_loss}")
+            if self.config['VERBOSE']:
+                print(f"Epoch {epoch}: loss:{curr_loss}")
         return loss_list
     
     def test(self):
@@ -72,7 +73,18 @@ class DeepAntSolver(object):
         true_labels = load_true_labels(self.data_path, losses.shape[0])
         reports = []
         
-        for th in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+        if self.config['TH_SEARCH']:
+            for th in self.config['TH_LIST']:
+                bool_losses = losses.copy()
+                for i,el in enumerate(losses):
+                        if el >= th:
+                            bool_losses[i] = 1
+                        else:
+                            bool_losses[i] = 0
+                report = classification_report(true_labels, bool_losses, output_dict=True)
+                reports.append(report)
+            return predictions, losses, reports
+        else: 
             bool_losses = losses.copy()
             for i,el in enumerate(losses):
                     if el >= th:
@@ -80,8 +92,7 @@ class DeepAntSolver(object):
                     else:
                         bool_losses[i] = 0
             report = classification_report(true_labels, bool_losses, output_dict=True)
-            reports.append(report)
-        return predictions, losses, reports
+            return predictions, losses, report
 
 
 def load_true_labels(data_path, l):
