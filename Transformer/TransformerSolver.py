@@ -33,7 +33,7 @@ class TransformerSolver(object):
         # self.pretrained_model = config['pretrained_model']
         # self.dataset = config['dataset']
         # self.mode = config['mode']
-        # self.data_path = config['data_path']
+        self.data_path = config['data_path']
         # self.model_save_path = config['model_save_path']
         # self.anormly_ratio = config['anormly_ratio']
 
