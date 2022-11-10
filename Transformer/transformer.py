@@ -24,18 +24,18 @@ def adjust_learning_rate(optimizer, epoch, lr_):
         print('Updating learning rate to {}'.format(lr))
 
 def load_data(data_path, batch_size, win_size, dataset):
-    train_loader = get_loader_segment(self.data_path, batch_size=self.batch_size, win_size=self.win_size,
+    train_loader = get_loader_segment(data_path, batch_size=batch_size, win_size=win_size,
                                                mode='train',
-                                               dataset=self.dataset)
-    vali_loader = get_loader_segment(self.data_path, batch_size=self.batch_size, win_size=self.win_size,
+                                               dataset=dataset)
+    vali_loader = get_loader_segment(data_path, batch_size=batch_size, win_size=win_size,
                                             mode='val',
-                                            dataset=self.dataset)
-    test_loader = get_loader_segment(self.data_path, batch_size=self.batch_size, win_size=self.win_size,
+                                            dataset=dataset)
+    test_loader = get_loader_segment(data_path, batch_size=batch_size, win_size=win_size,
                                             mode='test',
-                                            dataset=self.dataset)
-    thre_loader = get_loader_segment(self.data_path, batch_size=self.batch_size, win_size=self.win_size,
+                                            dataset=dataset)
+    thre_loader = get_loader_segment(data_path, batch_size=batch_size, win_size=win_size,
                                             mode='thre',
-                                            dataset=self.dataset)
+                                            dataset=dataset)
     return train_loader, vali_loader, test_loader, thre_loader
 
 class EarlyStopping:
