@@ -71,13 +71,15 @@ class DeepAntSolver(object):
         losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
         true_labels = load_true_labels(self.data_path, losses.shape[0])
         reports = []
+        
         for th in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+            bool_losses = losses.copy()
             for i,el in enumerate(losses):
                     if el >= th:
-                        losses[i] = 1
+                        bool_losses[i] = 1
                     else:
-                        losses[i] = 0
-            report = classification_report(true_labels, losses, output_dict=True)
+                        bool_losses[i] = 0
+            report = classification_report(true_labels, bool_losses, output_dict=True)
             reports.append(report)
         return predictions, losses, reports
 
