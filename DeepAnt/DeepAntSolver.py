@@ -79,5 +79,5 @@ class DeepAntSolver(object):
                 else:
                     losses[i] = 0
         
-        report = classification_report(arr_lbl, y_pred_norm, output_dict=True)
+        report = classification_report(arr_lbl, losses, output_dict=True)
         return generated_signal, losses, report
