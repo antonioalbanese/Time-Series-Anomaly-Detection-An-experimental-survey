@@ -57,6 +57,7 @@ class DeepAntSolver(object):
         self.model.eval()
         loss_list = []
         predictions = []
+        labels = []
         for i, batch in enumerate(self.test_dl):
             input, y = batch
             input = input.to(self.device)
@@ -65,6 +66,7 @@ class DeepAntSolver(object):
             predictions.append(output.item())
             loss = torch.linalg.norm(output-y)
             loss_list.append(loss.detach().item())
+            labels.append(y)
         
         sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
         losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
