@@ -73,7 +73,7 @@ class DeepAntSolver(object):
         reports = []
         for th in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
             for i,el in enumerate(losses):
-                    if el >= self.config['CONFIDENCE']:
+                    if el >= th:
                         losses[i] = 1
                     else:
                         losses[i] = 0
