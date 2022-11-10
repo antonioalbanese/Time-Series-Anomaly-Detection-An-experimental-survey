@@ -106,7 +106,7 @@ class TransformerSolver(object):
             'val_loss2':[]
         }
 
-        for epoch in range(self.num_epochs):
+        for epoch in range(self.config['EPOCHS']):
             iter_count = 0
             loss1_list = []
 
