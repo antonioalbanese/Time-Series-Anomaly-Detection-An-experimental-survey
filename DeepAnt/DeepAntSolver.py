@@ -76,7 +76,7 @@ class DeepAntSolver(object):
                     losses[i] = 0
         true_labels = load_true_labels(self.data_path, losses.shape[0])
         report = classification_report(true_labels, losses, output_dict=True)
-        return generated_signal, losses, report
+        return predictions, losses, report
 
 
 def load_true_labels(data_path, l):
