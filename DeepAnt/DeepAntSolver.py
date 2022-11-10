@@ -79,7 +79,7 @@ class DeepAntSolver(object):
         return generated_signal, losses, report
 
 
-def load_true_labels(data_path, len):
+def load_true_labels(data_path, l):
     with open("./NAB/combined_windows.json") as FI:
         j_label = json.load(FI)
     key = data_path.split("./NAB/")[-1]
@@ -95,4 +95,4 @@ def load_true_labels(data_path, len):
             if df.loc[idx, 'timestamp'] >= start and df.loc[idx, 'timestamp'] <= end:
                 y[idx] = 1.0
 
-    return y[:len]
+    return y[:l]
