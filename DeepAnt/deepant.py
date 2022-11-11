@@ -67,7 +67,7 @@ class DeepAnt(nn.Module):
 
         out_channels = 32
         flatten_out = out_channels*maxp2_out
-
+        print(flatten_out)
         self.convblock1 = nn.Sequential(
             nn.Conv1d(in_channels=1, out_channels=out_channels, kernel_size=conv1_k_size, padding='valid'),
             nn.ReLU(inplace=True),
@@ -91,21 +91,21 @@ class DeepAnt(nn.Module):
         self.out = nn.Linear(flatten_out, p_w)
         
     def forward(self, x):
-        print("input")
-        print(x.size())
-        print('##################')
+        # print("input")
+        # print(x.size())
+        # print('##################')
         x = self.convblock1(x)
-        print("conv1")
-        print(x.size())
-        print('##################')
+        # print("conv1")
+        # print(x.size())
+        # print('##################')
         x = self.convblock2(x)
-        print("conv2")
-        print(x.size())
-        print('##################')
+        # print("conv2")
+        # print(x.size())
+        # print('##################')
         x = self.flatten(x)
-        print("flatten")
-        print(x.size())
-        print('##################')
+        # print("flatten")
+        # print(x.size())
+        # print('##################')
         x = self.denseblock(x)
         x = self.out(x)
         return x
