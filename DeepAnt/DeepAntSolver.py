@@ -102,7 +102,7 @@ class DeepAntSolver(object):
         # else: 
         bool_losses = losses.copy()
         for i,el in enumerate(losses):
-                if el >= th:
+                if el >= self.config['CONFIDENCE']:
                     bool_losses[i] = 1
                 else:
                     bool_losses[i] = 0
