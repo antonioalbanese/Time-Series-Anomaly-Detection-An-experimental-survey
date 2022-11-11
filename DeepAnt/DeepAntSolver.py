@@ -30,12 +30,10 @@ class DeepAntSolver(object):
             self.dataset = TrafficDataset(df, self.config['SEQ_LEN'])
             self.train_dl = DataLoader(self.dataset, batch_size = 32, num_workers = 10, pin_memory = True, shuffle = False)
             self.test_dl = DataLoader(self.dataset, batch_size = 1, num_workers = 10, pin_memory = True, shuffle = False)
-            self.test_labels = load_true_labels(self.data_path, losses.shape[0])
         elif self.config['DATASET'] == 'MSL':
             self.n_feat = 55
             data = np.load(self.data_path + "/MSL_train.npy")
             test_data = np.load(self.data_path + "/MSL_test.npy")
-            self.test_labels = np.load(data_path + "/MSL_test_label.npy")
             df = pd.DataFrame(data)
             test_df = pd.DataFrame(test_data)
             self.dataset = MSLDataset(df, self.config['SEQ_LEN'])
@@ -85,7 +83,7 @@ class DeepAntSolver(object):
         
         sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
         losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
-        true_labels = self.test_labels
+        true_labels = load_true_labels(self.data_path, losses.shape[0])
         reports = []
         
         # if self.config['TH_SEARCH']:
@@ -111,19 +109,22 @@ class DeepAntSolver(object):
 
 
 def load_true_labels(data_path, l):
-    with open("./NAB/combined_windows.json") as FI:
-        j_label = json.load(FI)
-    key = data_path.split("./NAB/")[-1]
-    windows = j_label[key]
+    if self.config['DATASET'] == 'NAB':
+        with open("./NAB/combined_windows.json") as FI:
+            j_label = json.load(FI)
+        key = data_path.split("./NAB/")[-1]
+        windows = j_label[key]
 
-    df = pd.read_csv(data_path)
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
-    y = np.zeros(len(df))
-    for w in windows:
-        start = pd.to_datetime(w[0])
-        end = pd.to_datetime(w[1])
-        for idx in df.index:
-            if df.loc[idx, 'timestamp'] >= start and df.loc[idx, 'timestamp'] <= end:
-                y[idx] = 1.0
-
+        df = pd.read_csv(data_path)
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        y = np.zeros(len(df))
+        for w in windows:
+            start = pd.to_datetime(w[0])
+            end = pd.to_datetime(w[1])
+            for idx in df.index:
+                if df.loc[idx, 'timestamp'] >= start and df.loc[idx, 'timestamp'] <= end:
+                    y[idx] = 1.0
+    elif self.config['DATASET'] == 'MSL':
+        y = np.load(data_path + "/MSL_test_label.npy")
+        
     return y[:l]
