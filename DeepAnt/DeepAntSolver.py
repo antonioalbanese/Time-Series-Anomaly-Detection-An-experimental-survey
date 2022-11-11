@@ -33,8 +33,8 @@ class DeepAntSolver(object):
             self.test_labels = load_true_labels(self.data_path, losses.shape[0])
         elif self.config['DATASET'] == 'MSL':
             self.n_feat = 55
-            data = np.load(datapath + "/MSL_train.npy")
-            test_data = np.load(datapath + "/MSL_test.npy")
+            data = np.load(self.data_path + "/MSL_train.npy")
+            test_data = np.load(self.data_path + "/MSL_test.npy")
             self.test_labels = np.load(data_path + "/MSL_test_label.npy")
             df = pd.DataFrame(data)
             test_df = pd.DataFrame(test_data)
