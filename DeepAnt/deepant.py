@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
+import math
 # import pytorch_lightning as pl
 
 from sklearn.preprocessing import MinMaxScaler
@@ -54,28 +55,40 @@ class TrafficDataset(Dataset):
 class DeepAnt(nn.Module):
     def __init__(self, seq_len, p_w):
         super().__init__()
-        
+        conv1_k_size = 3
+        conv1_out = seq_len - conv1_k_size
+        maxp1_k_size = 2
+        maxp1_out = math.ceil((conv1_out - maxp1_k_size)/maxp1_k_size + 1)
+
+        conv2_k_size = 3
+        conv2_out = maxp1_out - conv2_k_size
+        maxp2_k_size = 2
+        maxp2_out = math.ceil((conv2_out - maxp2_k_size)/maxp2_k_size + 1)
+
+        out_channels = 32
+        flatten_out = out_channels*maxp2_out
+
         self.convblock1 = nn.Sequential(
-            nn.Conv1d(in_channels=1, out_channels=32, kernel_size=3, padding='valid'),
+            nn.Conv1d(in_channels=1, out_channels=out_channels, kernel_size=conv1_k_size, padding='valid'),
             nn.ReLU(inplace=True),
-            nn.MaxPool1d(kernel_size=2)
+            nn.MaxPool1d(kernel_size=maxp1_k_size)
         )
         
         self.convblock2 = nn.Sequential(
-            nn.Conv1d(in_channels=32, out_channels=32, kernel_size=3, padding='valid'),
+            nn.Conv1d(in_channels=32, out_channels=out_channels, kernel_size=conv2_k_size, padding='valid'), #11
             nn.ReLU(inplace=True),
-            nn.MaxPool1d(kernel_size=2)
+            nn.MaxPool1d(kernel_size=maxp2_k_size) ## (11-2)/2 + 1 = 6
         )
         
-        self.flatten = nn.Flatten()
+        self.flatten = nn.Flatten() ## out_channels*dim_out_maxpool
         
         self.denseblock = nn.Sequential(
-            nn.Linear(32, 40),
+            nn.Linear(32, flatten_out),
             #nn.Linear(96, 40), # for SEQL_LEN = 20
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.25),
         )
-        self.out = nn.Linear(40, p_w)
+        self.out = nn.Linear(flatten_out, p_w)
         
     def forward(self, x):
         print("input")
