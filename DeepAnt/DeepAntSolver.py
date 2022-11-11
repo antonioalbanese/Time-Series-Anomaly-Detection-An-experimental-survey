@@ -24,10 +24,23 @@ class DeepAntSolver(object):
         
 
     def prepare_data(self, data_path):
-        df = pd.read_csv(self.data_path, index_col = 'timestamp', parse_dates=['timestamp'])
-        self.dataset = TrafficDataset(df, self.config['SEQ_LEN'])
-        self.train_dl = DataLoader(self.dataset, batch_size = 32, num_workers = 10, pin_memory = True, shuffle = True)
-        self.test_dl = DataLoader(self.dataset, batch_size = 1, num_workers = 10, pin_memory = True, shuffle = False)
+        if self.config['DATASET'] == 'NAB':
+            df = pd.read_csv(self.data_path, index_col = 'timestamp', parse_dates=['timestamp'])
+            self.dataset = TrafficDataset(df, self.config['SEQ_LEN'])
+            self.train_dl = DataLoader(self.dataset, batch_size = 32, num_workers = 10, pin_memory = True, shuffle = False)
+            self.test_dl = DataLoader(self.dataset, batch_size = 1, num_workers = 10, pin_memory = True, shuffle = False)
+            self.test_labels = load_true_labels(self.data_path, losses.shape[0])
+        elif self.config['DATASET'] == 'MSL':
+            data = np.load(datapath + "/MSL_train.npy")
+            test_data = np.load(datapath + "/MSL_test.npy")
+            self.test_labels = np.load(data_path + "/MSL_test_label.npy")
+            df = pd.DataFrame(data)
+            test_df = pd.DataFrame(test_data)
+            self.dataset = MSLDataset(df, self.config['SEQ_LEN'])
+            self.test_dataset = MSLDataset(test_df, self.config['SEQ_LEN'])
+            self.train_dl = DataLoader(self.dataset, batch_size = 32, num_workers = 10, pin_memory = True, shuffle = False)
+            self.test_dl = DataLoader(self.test_dataset, batch_size = 1, num_workers = 10, pin_memory = True, shuffle = False)
+
 
     def build_model(self):
         self.model = DeepAnt(self.config['SEQ_LEN'], self.config['out_dim'])
@@ -70,29 +83,29 @@ class DeepAntSolver(object):
         
         sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
         losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
-        true_labels = load_true_labels(self.data_path, losses.shape[0])
+        true_labels = self.test_labels
         reports = []
         
-        if self.config['TH_SEARCH']:
-            for th in self.config['TH_LIST']:
-                bool_losses = losses.copy()
-                for i,el in enumerate(losses):
-                        if el >= th:
-                            bool_losses[i] = 1
-                        else:
-                            bool_losses[i] = 0
-                report = classification_report(true_labels, bool_losses, output_dict=True)
-                reports.append(report)
-            return predictions, losses, reports
-        else: 
-            bool_losses = losses.copy()
-            for i,el in enumerate(losses):
-                    if el >= th:
-                        bool_losses[i] = 1
-                    else:
-                        bool_losses[i] = 0
-            report = classification_report(true_labels, bool_losses, output_dict=True)
-            return predictions, losses, report
+        # if self.config['TH_SEARCH']:
+        #     for th in self.config['TH_LIST']:
+        #         bool_losses = losses.copy()
+        #         for i,el in enumerate(losses):
+        #                 if el >= th:
+        #                     bool_losses[i] = 1
+        #                 else:
+        #                     bool_losses[i] = 0
+        #         report = classification_report(true_labels, bool_losses, output_dict=True)
+        #         reports.append(report)
+        #     return predictions, losses, reports
+        # else: 
+        bool_losses = losses.copy()
+        for i,el in enumerate(losses):
+                if el >= th:
+                    bool_losses[i] = 1
+                else:
+                    bool_losses[i] = 0
+        report = classification_report(true_labels, bool_losses, output_dict=True)
+        return predictions, losses, report
 
 
 def load_true_labels(data_path, l):

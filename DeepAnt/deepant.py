@@ -37,6 +37,36 @@ class TrafficDataset(Dataset):
         return (torch.tensor(self.sequence[idx], dtype = torch.float).permute(1, 0), 
                 torch.tensor(self.labels[idx], dtype = torch.float))
 
+class MSLDataset(Dataset):
+    def __init__(self, df, seq_len):
+        self.df = df
+        self.seq_len = seq_len
+        self.sequence, self.labels, self.timestamp = self.create_sequence(df, seq_len)
+
+    def create_sequence(self, df, seq_len):
+        sc = MinMaxScaler()
+        index = df.index.to_numpy()
+        ts = sc.fit_transform(df.values)
+        
+        sequence = []
+        label = []
+        timestamp = []
+        for i in range(len(ts) - seq_len):
+            sequence.append(ts[i:i+seq_len])
+            label.append(ts[i+seq_len])
+            timestamp.append(index[i+seq_len])
+            
+            
+        return np.array(sequence), np.array(label), np.array(timestamp)
+    
+    def __len__(self):
+        return len(self.df) - self.seq_len
+    
+    def __getitem__(self, idx):
+        return (torch.tensor(self.sequence[idx], dtype = torch.float).permute(1, 0), 
+                torch.tensor(self.labels[idx], dtype = torch.float))
+
+
 # class DataModule(pl.LightningDataModule):
 #     def __init__(self, df, seq_len):
 #         super().__init__()
