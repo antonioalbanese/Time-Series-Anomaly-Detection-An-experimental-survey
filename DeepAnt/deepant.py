@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 # import pytorch_lightning as pl
+import math
 
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader, Dataset
@@ -54,6 +55,10 @@ class TrafficDataset(Dataset):
 class DeepAnt(nn.Module):
     def __init__(self, seq_len, p_w):
         super().__init__()
+
+        block1_out = math.ceil(((seq_len-3)- 2)/2 + 1)
+        block2_out = math.ceil((block1_out - 3 - 2)/2 + 1)
+        flatten_out =  32 * block2_out
         
         self.convblock1 = nn.Sequential(
             nn.Conv1d(in_channels=1, out_channels=32, kernel_size=3, padding='valid'),
@@ -70,7 +75,7 @@ class DeepAnt(nn.Module):
         self.flatten = nn.Flatten()
         
         self.denseblock = nn.Sequential(
-            nn.Linear(32, 40),
+            nn.Linear(flatten_out, 40),
             #nn.Linear(96, 40), # for SEQL_LEN = 20
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.25),
