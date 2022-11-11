@@ -25,12 +25,14 @@ class DeepAntSolver(object):
 
     def prepare_data(self, data_path):
         if self.config['DATASET'] == 'NAB':
+            self.n_feat = 1
             df = pd.read_csv(self.data_path, index_col = 'timestamp', parse_dates=['timestamp'])
             self.dataset = TrafficDataset(df, self.config['SEQ_LEN'])
             self.train_dl = DataLoader(self.dataset, batch_size = 32, num_workers = 10, pin_memory = True, shuffle = False)
             self.test_dl = DataLoader(self.dataset, batch_size = 1, num_workers = 10, pin_memory = True, shuffle = False)
             self.test_labels = load_true_labels(self.data_path, losses.shape[0])
         elif self.config['DATASET'] == 'MSL':
+            self.n_feat = 55
             data = np.load(datapath + "/MSL_train.npy")
             test_data = np.load(datapath + "/MSL_test.npy")
             self.test_labels = np.load(data_path + "/MSL_test_label.npy")
@@ -43,7 +45,7 @@ class DeepAntSolver(object):
 
 
     def build_model(self):
-        self.model = DeepAnt(self.config['SEQ_LEN'], self.config['out_dim'])
+        self.model = DeepAnt(self.n_feat, self.config['SEQ_LEN'], self.config['out_dim'])
         # self.anomaly_detector = AnomalyDetector(self.model)
         self.criterion = nn.L1Loss()
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr = self.config['LR'])

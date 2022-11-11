@@ -83,7 +83,7 @@ class MSLDataset(Dataset):
 
 
 class DeepAnt(nn.Module):
-    def __init__(self, seq_len, p_w):
+    def __init__(self, n_features, seq_len, p_w):
         super().__init__()
 
         block1_out = math.ceil(((seq_len-3)- 2)/2 + 1)
@@ -91,7 +91,7 @@ class DeepAnt(nn.Module):
         flatten_out =  32 * block2_out
         
         self.convblock1 = nn.Sequential(
-            nn.Conv1d(in_channels=1, out_channels=32, kernel_size=3, padding='valid'),
+            nn.Conv1d(in_channels=n_features, out_channels=32, kernel_size=3, padding='valid'),
             nn.ReLU(inplace=True),
             nn.MaxPool1d(kernel_size=2)
         )
