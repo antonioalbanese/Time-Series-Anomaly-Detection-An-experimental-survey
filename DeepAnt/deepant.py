@@ -81,6 +81,9 @@ class DeepAnt(nn.Module):
         x = self.convblock1(x)
         x = self.convblock2(x)
         x = self.flatten(x)
+        print("#################")
+        print(x.size())
+        print('##################')
         x = self.denseblock(x)
         x = self.out(x)
         return x
