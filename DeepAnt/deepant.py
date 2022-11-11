@@ -83,7 +83,7 @@ class DeepAnt(nn.Module):
         self.flatten = nn.Flatten() ## out_channels*dim_out_maxpool
         
         self.denseblock = nn.Sequential(
-            nn.Linear(flatten_out, 40),
+            nn.Linear(32, 40),
             #nn.Linear(96, 40), # for SEQL_LEN = 20
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.25),
