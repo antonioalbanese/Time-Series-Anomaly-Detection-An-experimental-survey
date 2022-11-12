@@ -59,6 +59,7 @@ class DeepAntSolver(object):
                 input = input.to(self.device)
                 y = y.to(self.device)
                 output = self.model(input)
+                print(output.size())
                 loss = self.criterion(output, y)
                 curr_loss += loss.item()
                 loss.backward()
