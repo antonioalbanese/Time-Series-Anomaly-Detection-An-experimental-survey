@@ -78,8 +78,8 @@ class DeepAntSolver(object):
             input = input.to(self.device)
             y = y.to(self.device)
             output = self.model(input)
-            predictions.append(output.item())
             loss = torch.linalg.norm(output-y)
+            predictions.append(output.cpu().numpy())
             loss_list.append(loss.detach().item())
         
         sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
