@@ -83,7 +83,7 @@ class DeepAntSolver(object):
         
         sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
         losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
-        true_labels = load_true_labels(self.data_path, losses.shape[0])
+        true_labels = self.load_true_labels(self.data_path, losses.shape[0])
         reports = []
         
         # if self.config['TH_SEARCH']:
@@ -108,23 +108,23 @@ class DeepAntSolver(object):
         return predictions, losses, report
 
 
-def load_true_labels(data_path, l):
-    if self.config['DATASET'] == 'NAB':
-        with open("./NAB/combined_windows.json") as FI:
-            j_label = json.load(FI)
-        key = data_path.split("./NAB/")[-1]
-        windows = j_label[key]
+    def load_true_labels(self, data_path, l):
+        if self.config['DATASET'] == 'NAB':
+            with open("./NAB/combined_windows.json") as FI:
+                j_label = json.load(FI)
+            key = data_path.split("./NAB/")[-1]
+            windows = j_label[key]
 
-        df = pd.read_csv(data_path)
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
-        y = np.zeros(len(df))
-        for w in windows:
-            start = pd.to_datetime(w[0])
-            end = pd.to_datetime(w[1])
-            for idx in df.index:
-                if df.loc[idx, 'timestamp'] >= start and df.loc[idx, 'timestamp'] <= end:
-                    y[idx] = 1.0
-    elif self.config['DATASET'] == 'MSL':
-        y = np.load(data_path + "/MSL_test_label.npy")
-        
-    return y[:l]
+            df = pd.read_csv(data_path)
+            df['timestamp'] = pd.to_datetime(df['timestamp'])
+            y = np.zeros(len(df))
+            for w in windows:
+                start = pd.to_datetime(w[0])
+                end = pd.to_datetime(w[1])
+                for idx in df.index:
+                    if df.loc[idx, 'timestamp'] >= start and df.loc[idx, 'timestamp'] <= end:
+                        y[idx] = 1.0
+        elif self.config['DATASET'] == 'MSL':
+            y = np.load(data_path + "/MSL_test_label.npy")
+            
+        return y[:l]
