@@ -43,7 +43,7 @@ class DeepAntSolver(object):
 
 
     def build_model(self):
-        self.model = DeepAnt(self.n_feat, self.config['SEQ_LEN'], self.config['out_dim'])
+        self.model = DeepAnt(self.n_feat, self.config['SEQ_LEN'], 55)
         # self.anomaly_detector = AnomalyDetector(self.model)
         self.criterion = nn.L1Loss()
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr = self.config['LR'])
