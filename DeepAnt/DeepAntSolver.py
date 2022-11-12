@@ -60,7 +60,6 @@ class DeepAntSolver(object):
                 y = y.to(self.device)
                 output = self.model(input)
                 loss = self.criterion(output, y)
-                print(loss.size())
                 curr_loss += loss.item()
                 loss.backward()
                 self.optimizer.step()
@@ -70,42 +69,43 @@ class DeepAntSolver(object):
         return loss_list
     
     def test(self):
-        self.model.eval()
-        loss_list = []
-        predictions = []
-        for i, batch in enumerate(self.test_dl):
-            input, y = batch
-            input = input.to(self.device)
-            y = y.to(self.device)
-            output = self.model(input)
-            loss = torch.linalg.norm(output-y)
-            predictions.append(output.cpu().numpy())
-            loss_list.append(loss.detach().item())
-        
-        sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
-        losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
-        true_labels = self.load_true_labels(self.data_path, losses.shape[0])
-        reports = []
-        
-        # if self.config['TH_SEARCH']:
-        #     for th in self.config['TH_LIST']:
-        #         bool_losses = losses.copy()
-        #         for i,el in enumerate(losses):
-        #                 if el >= th:
-        #                     bool_losses[i] = 1
-        #                 else:
-        #                     bool_losses[i] = 0
-        #         report = classification_report(true_labels, bool_losses, output_dict=True)
-        #         reports.append(report)
-        #     return predictions, losses, reports
-        # else: 
-        bool_losses = losses.copy()
-        for i,el in enumerate(losses):
-                if el >= self.config['CONFIDENCE']:
-                    bool_losses[i] = 1
-                else:
-                    bool_losses[i] = 0
-        report = classification_report(true_labels, bool_losses, output_dict=True)
+        with torch.no_grad():
+            self.model.eval()
+            loss_list = []
+            predictions = []
+            for i, batch in enumerate(self.test_dl):
+                input, y = batch
+                input = input.to(self.device)
+                y = y.to(self.device)
+                output = self.model(input)
+                loss = torch.linalg.norm(output-y)
+                predictions.append(output.cpu().numpy())
+                loss_list.append(loss.detach().item())
+            
+            sc = sklearn.preprocessing.MinMaxScaler(feature_range=(0,1))
+            losses = sc.fit_transform(np.array(loss_list).reshape(-1, 1))
+            true_labels = self.load_true_labels(self.data_path, losses.shape[0])
+            reports = []
+            
+            # if self.config['TH_SEARCH']:
+            #     for th in self.config['TH_LIST']:
+            #         bool_losses = losses.copy()
+            #         for i,el in enumerate(losses):
+            #                 if el >= th:
+            #                     bool_losses[i] = 1
+            #                 else:
+            #                     bool_losses[i] = 0
+            #         report = classification_report(true_labels, bool_losses, output_dict=True)
+            #         reports.append(report)
+            #     return predictions, losses, reports
+            # else: 
+            bool_losses = losses.copy()
+            for i,el in enumerate(losses):
+                    if el >= self.config['CONFIDENCE']:
+                        bool_losses[i] = 1
+                    else:
+                        bool_losses[i] = 0
+            report = classification_report(true_labels, bool_losses, output_dict=True)
         return predictions, losses, report
 
 
