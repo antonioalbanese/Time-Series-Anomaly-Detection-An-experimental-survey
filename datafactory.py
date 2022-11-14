@@ -48,7 +48,7 @@ class MyDataset(Dataset):
                 for i in list(data):
                     data[i]=data[i].apply(lambda x: str(x).replace("," , "."))
                 data = data.astype(float)
-                data = pd.DataFrame(scaler.transform(data.values))
+                data = pd.DataFrame(scaler.fit_transform(data.values))
                 ### window test data
                 self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
                 self.n_sequences = self.sequences.shape[0]
