@@ -73,10 +73,12 @@ class SWATDataset(Dataset):
         self.sequence, self.labels, self.timestamp = self.create_sequence(df, seq_len)
 
     def create_sequence(self, df, seq_len):
+        print("SCALER")
         sc = MinMaxScaler()
         index = df.index.to_numpy()
         ts = sc.fit_transform(df.values)
-        
+        print("SCALED")
+        print("window")
         sequence = []
         label = []
         timestamp = []
@@ -84,7 +86,7 @@ class SWATDataset(Dataset):
             sequence.append(ts[i:i+seq_len])
             label.append(ts[i+seq_len])
             timestamp.append(index[i+seq_len])
-            
+        print("WINDOWED")
             
         return np.array(sequence), np.array(label), np.array(timestamp)
     
