@@ -22,6 +22,8 @@ class MyDataset(Dataset):
 
     def load_data(self):
         scaler = MinMaxScaler()
+        window_size = self.seq_len
+        step = self.step
         if self.dataset == 'SWAT':
             """SWAT DATASET MUST BE DOWNLOADED IN data/SWAT"""
             if self.mode == "TRAIN":
@@ -35,8 +37,6 @@ class MyDataset(Dataset):
                 #scale data
                 data = pd.DataFrame(scaler.fit_transform(data.values))
                 #window train data
-                window_size = self.seq_len
-                step = self.step
                 self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
                 self.n_sequences = self.sequences.shape[0]
                 self.n_features = data.values.shape[-1]
