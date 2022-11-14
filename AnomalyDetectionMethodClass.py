@@ -10,7 +10,7 @@ from LSTMEncoderDecoder import LSTMSolver
 from USAD import USADSolver
 
 
-class ADMethod():
+class ADMethod_back():
 	def __init__(self, method_name:str, settings: dict, data_path: str):
 		self.method_name = method_name
 		self.settings = settings
@@ -47,3 +47,62 @@ class ADMethod():
 		
 		
 		return self.anomaly_scores, self.classification_report
+
+
+class ADMethod():
+	def __init__(name:str, config: dict):
+		self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+		self.name = name
+		self.config = config
+		self.train_ds = MyDataset(dataset=self.config['DATASET'], 
+								  data_path=self.config['DATAPATH'], 
+								  seq_len= sle.fconfig['SEQ_LEN'], 
+								  step=self.config['STEP'], 
+								  method= self.name, 
+								  mode='TRAIN')
+		self.test_ds = MyDataset(dataset=self.config['DATASET'], 
+								 data_path=self.config['DATAPATH'], 
+								 seq_len= sle.fconfig['SEQ_LEN'], 
+								 step=self.config['STEP'], 
+								 method= self.name,
+								 mode='TEST')
+		self.train_dl = DataLoader(self.train_ds, batch_size = 256, num_workers = 4, shuffle = False)
+		self.test_dl = DataLoader(self.test_ds, batch_size = 256, num_workers = 4, shuffle = False)
+		
+		if self.name == 'DEEPANT':
+			self.model = DeepAnt(n_features = self.train_ds.n_features, seq_len = self.config['SEQ_LEN'])
+			self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.config['LR'], momentum=0.9)
+			self.criterion = nn.L1loss()
+	
+	def train():
+		self.model.to(self.device)
+		self.model.train()
+
+		for epoch in range(self.config['EPOCHS']):
+			epoch_loss = deepAntEpoch(self.model, self.optimizer, self.train_loader)
+			if self.config['VERBOSE']:
+				print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
+		if self.config['VERBOSE']:
+			print("training finished")
+
+
+
+
+
+
+
+
+
+def deepAntEpoch(model: DeepAnt, loader: DataLoader, criterion, optimizer,):
+	curr_loss = 0
+	for idx, (batch, batch_labels) in enumerate(loader):
+		batch = batch.to(self.device)
+		batch_labels = batch_labels.to(self.device)
+		output = model(batch)
+		loss = criterion(output, batch)
+		curr_loss += loss.item()
+		loss.backward()
+		optimizer.step()
+	return curr_loss/len(loader)
+
+

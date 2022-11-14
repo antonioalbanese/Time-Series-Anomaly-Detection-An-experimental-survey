@@ -145,21 +145,9 @@ class DeepAnt(nn.Module):
         self.out = nn.Linear(40, p_w)
         
     def forward(self, x):
-        # print("input")
-        # print(x.size())
-        # print('##################')
         x = self.convblock1(x)
-        # print("conv1")
-        # print(x.size())
-        # print('##################')
         x = self.convblock2(x)
-        # print("conv2")
-        # print(x.size())
-        # print('##################')
         x = self.flatten(x)
-        # print("flatten")
-        # print(x.size())
-        # print('##################')
         x = self.denseblock(x)
         x = self.out(x)
         return x
