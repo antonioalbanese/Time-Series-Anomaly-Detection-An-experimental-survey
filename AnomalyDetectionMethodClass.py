@@ -85,7 +85,7 @@ class ADMethod():
 		self.model.train()
 
 		for epoch in range(self.config['EPOCHS']):
-			epoch_loss = deepAntEpoch(self.model, self.optimizer, self.train_loader)
+			epoch_loss = deepAntEpoch(self.model, self.optimizer, self.train_dl)
 			if self.config['VERBOSE']:
 				print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
 		if self.config['VERBOSE']:
