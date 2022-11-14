@@ -85,7 +85,7 @@ class ADMethod():
 		self.model.train()
 
 		for epoch in range(self.config['EPOCHS']):
-			epoch_loss = deepAntEpoch(self.model, self.optimizer, self.train_dl)
+			epoch_loss = deepAntEpoch(self.model, self.train_dl, self.criterion, self.optimizer)
 			if self.config['VERBOSE']:
 				print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
 		if self.config['VERBOSE']:
@@ -99,7 +99,7 @@ class ADMethod():
 
 
 
-def deepAntEpoch(model: DeepAnt, loader: DataLoader, criterion, optimizer,):
+def deepAntEpoch(model: DeepAnt, loader: DataLoader, criterion, optimizer):
 	curr_loss = 0
 	for idx, (batch, batch_labels) in enumerate(loader):
 		batch = batch.to(self.device)
