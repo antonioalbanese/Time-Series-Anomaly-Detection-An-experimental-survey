@@ -42,6 +42,7 @@ class MSLDataset(Dataset):
         self.df = df
         self.seq_len = seq_len
         self.sequence, self.labels, self.timestamp = self.create_sequence(df, seq_len)
+        print("returned")
 
     def create_sequence(self, df, seq_len):
         sc = MinMaxScaler()
