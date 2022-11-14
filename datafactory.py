@@ -21,6 +21,7 @@ class MyDataset(Dataset):
 
 
     def load_data(self):
+        scaler = MinMaxScaler()
         if self.dataset == 'SWAT':
             """SWAT DATASET MUST BE DOWNLOADED IN data/SWAT"""
             if self.mode == "TRAIN":
@@ -32,7 +33,6 @@ class MyDataset(Dataset):
                     data[i]=data[i].apply(lambda x: str(x).replace("," , "."))
                 data = data.astype(float)
                 #scale data
-                scaler = MinMaxScaler()
                 data = pd.DataFrame(scaler.fit_transform(data.values))
                 #window train data
                 window_size = self.seq_len
