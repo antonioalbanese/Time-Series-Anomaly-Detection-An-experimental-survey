@@ -62,7 +62,7 @@ class ADMethod():
 		self.config = config
 		self.train_ds = MyDataset(dataset=self.config['DATASET'], 
 								  data_path=self.config['DATAPATH'], 
-								  seq_len= sle.fconfig['SEQ_LEN'], 
+								  seq_len= self.config['SEQ_LEN'], 
 								  step=self.config['STEP'], 
 								  method= self.name, 
 								  mode='TRAIN')
