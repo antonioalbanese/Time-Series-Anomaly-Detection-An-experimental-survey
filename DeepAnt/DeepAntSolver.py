@@ -43,6 +43,7 @@ class DeepAntSolver(object):
         elif self.config['DATASET'] == 'SWAT':
             self.n_feat = 51
             ### load train data
+            print('LOAD TRAIN DATA')
             train_data = pd.read_csv("input/SWaT_Dataset_Normal_v1.csv", index_col = 'Timestamp', parse_dates=['Timestamp'])
             train_data = train_data.drop(["Normal/Attack" ] , axis = 1)
             for i in list(train_data): 
@@ -51,7 +52,8 @@ class DeepAntSolver(object):
             ### train_data is df of float with timestamp as index
             self.dataset = SWATDataset(train_data, self.config['SEQ_LEN'])
             self.train_dl = DataLoader(self.dataset, batch_size = 32, num_workers = 10, pin_memory = True, shuffle = False)
-            
+            print('TRAIN_DL READY')
+            print('LOAD TEST DATA')
             ### load test data
             attack = pd.read_csv("input/SWaT_Dataset_Attack_v0.csv",sep=";", index_col = 'Timestamp', parse_dates=['Timestamp'])
             attack = attack.drop(["Normal/Attack"] , axis = 1)
@@ -60,7 +62,7 @@ class DeepAntSolver(object):
             attack = attack.astype(float)
             self.test_dataset = SWATDataset(attack, self.config['SEQ_LEN'])
             self.test_dl = DataLoader(self.test_dataset, batch_size = 1, num_workers = 10, pin_memory = True, shuffle = False)
-
+            print('TEST_DL READY')
     def build_model(self):
         self.model = DeepAnt(self.n_feat, self.config['SEQ_LEN'], 55)
         # self.anomaly_detector = AnomalyDetector(self.model)
