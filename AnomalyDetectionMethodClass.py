@@ -80,7 +80,7 @@ class ADMethod():
 			self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.config['LR'], momentum=0.9)
 			self.criterion = torch.nn.L1Loss()
 	
-	def train():
+	def train(self):
 		self.model.to(self.device)
 		self.model.train()
 
