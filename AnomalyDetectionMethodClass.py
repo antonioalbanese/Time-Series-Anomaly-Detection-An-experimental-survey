@@ -102,7 +102,7 @@ class ADMethod():
 def deepAntEpoch(model: DeepAnt, loader: DataLoader, criterion, optimizer, device):
 	curr_loss = 0
 	for idx, (batch, batch_labels) in enumerate(loader):
-		batch = batch.to(device)
+		batch = batch.to(device).permute(0,-1,1)
 		batch_labels = batch_labels.to(device)
 		output = model(batch)
 		loss = criterion(output, batch)
