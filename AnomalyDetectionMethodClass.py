@@ -8,6 +8,8 @@ from Transformer import TransformerSolver
 from DeepAnt import DeepAntSolver
 from LSTMEncoderDecoder import LSTMSolver
 from USAD import USADSolver
+from models import DeepAnt
+from datafactory import MyDataset
 
 
 class ADMethod_back():
