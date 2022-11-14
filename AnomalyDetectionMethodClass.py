@@ -78,7 +78,7 @@ class ADMethod():
 		if self.name == 'DEEPANT':
 			self.model = DeepAnt(n_features = self.train_ds.n_features, seq_len = self.config['SEQ_LEN'])
 			self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.config['LR'], momentum=0.9)
-			self.criterion = nn.L1loss()
+			self.criterion = torch.nn.L1Loss()
 	
 	def train():
 		self.model.to(self.device)
