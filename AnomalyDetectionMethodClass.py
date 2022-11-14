@@ -56,7 +56,7 @@ class ADMethod_back():
 
 
 class ADMethod():
-	def __init__(name:str, config: dict):
+	def __init__(self, name:str, config: dict):
 		self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 		self.name = name
 		self.config = config
