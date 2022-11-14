@@ -50,7 +50,7 @@ class DeepAntSolver(object):
                 train_data[i]=train_data[i].apply(lambda x: str(x).replace("," , "."))
             train_data = train_data.astype(float)
             ### train_data is df of float with timestamp as index
-            self.dataset = SWATDataset(train_data, self.config['SEQ_LEN'])
+            dataset = SWATDataset(train_data, self.config['SEQ_LEN'])
             print("self.dataset ready")
             self.train_dl = DataLoader(self.dataset, batch_size = 32, num_workers = 10, pin_memory = True, shuffle = False)
             print('TRAIN_DL READY')
