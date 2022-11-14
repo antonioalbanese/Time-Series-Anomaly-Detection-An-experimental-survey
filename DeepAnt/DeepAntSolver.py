@@ -7,7 +7,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import numpy as np
 
-from DeepAnt.deepant import TrafficDataset, DeepAnt, MSLDataset
+from DeepAnt.deepant import TrafficDataset, DeepAnt, MSLDataset, SWATDataset
 from sklearn.metrics import classification_report
 import sklearn
 import json
