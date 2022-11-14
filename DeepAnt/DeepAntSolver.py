@@ -40,7 +40,26 @@ class DeepAntSolver(object):
             self.test_dataset = MSLDataset(test_df, self.config['SEQ_LEN'])
             self.train_dl = DataLoader(self.dataset, batch_size = 32, num_workers = 10, pin_memory = True, shuffle = False)
             self.test_dl = DataLoader(self.test_dataset, batch_size = 1, num_workers = 10, pin_memory = True, shuffle = False)
-
+        elif self.config['DATASET'] == 'SWAT':
+            self.n_feat = 51
+            ### load train data
+            train_data = pd.read_csv("input/SWaT_Dataset_Normal_v1.csv", index_col = 'Timestamp', parse_dates=['timestamp'])
+            train_data = train_data.drop(["Normal/Attack" ] , axis = 1)
+            for i in list(train_data): 
+                train_data[i]=train_data[i].apply(lambda x: str(x).replace("," , "."))
+            train_data = train_data.astype(float)
+            ### train_data is df of float with timestamp as index
+            self.dataset = SWATDataset(train_data, self.config['SEQ_LEN'])
+            self.train_dl = DataLoader(self.dataset, batch_size = 32, num_workers = 10, pin_memory = True, shuffle = False)
+            
+            ### load test data
+            attack = pd.read_csv("input/SWaT_Dataset_Attack_v0.csv",sep=";", index_col = 'Timestamp', parse_dates=['timestamp'])
+            attack = attack.drop(["Normal/Attack"] , axis = 1)
+            for i in list(attack):
+                attack[i]=attack[i].apply(lambda x: str(x).replace("," , "."))
+            attack = attack.astype(float)
+            self.test_dataset = SWATDataset(attack, self.config['SEQ_LEN'])
+            self.test_dl = DataLoader(self.test_dataset, batch_size = 1, num_workers = 10, pin_memory = True, shuffle = False)
 
     def build_model(self):
         self.model = DeepAnt(self.n_feat, self.config['SEQ_LEN'], 55)
