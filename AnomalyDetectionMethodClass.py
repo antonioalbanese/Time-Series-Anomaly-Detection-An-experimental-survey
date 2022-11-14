@@ -105,7 +105,7 @@ def deepAntEpoch(model: DeepAnt, loader: DataLoader, criterion, optimizer, devic
 		batch = batch.to(device).permute(0,-1,1)
 		batch_labels = batch_labels.to(device)
 		output = model(batch)
-		loss = criterion(output, batch)
+		loss = criterion(output, batch_labels)
 		curr_loss += loss.item()
 		loss.backward()
 		optimizer.step()
