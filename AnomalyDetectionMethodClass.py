@@ -91,7 +91,7 @@ class ADMethod():
 		if self.config['VERBOSE']:
 			print("training finished")
 
-	def test(self, threshold = self.config['THRESHOLD']):
+	def test(self):
 		with torch.no_grad():
 			self.model.eval()
 			predictions, scores = testDeepAnt(self.model, self.test_dl, self.criterion, self.device)
