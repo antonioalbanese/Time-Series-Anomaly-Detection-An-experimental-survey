@@ -73,7 +73,7 @@ class ADMethod():
 								 method= self.name,
 								 mode='TEST')
 		self.train_dl = DataLoader(self.train_ds, batch_size = 256, num_workers = 4, shuffle = False)
-		self.test_dl = DataLoader(self.test_ds, batch_size = 256, num_workers = 4, shuffle = False)
+		self.test_dl = DataLoader(self.test_ds, batch_size = 1, num_workers = 4, shuffle = False)
 		
 		if self.name == 'DEEPANT':
 			self.model = DeepAnt(n_features = self.train_ds.n_features, seq_len = self.config['SEQ_LEN'])
