@@ -94,6 +94,7 @@ class ADMethod():
 	def test(self):
 		with torch.no_grad():
 			self.model.eval()
+			self,model.to(device)
 			predictions, scores = testDeepAnt(self.model, self.test_dl, self.criterion, self.device)
 		return predictions, scores
 
