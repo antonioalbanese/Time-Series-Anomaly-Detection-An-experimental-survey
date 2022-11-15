@@ -91,6 +91,11 @@ class ADMethod():
 		if self.config['VERBOSE']:
 			print("training finished")
 
+	def test(self, threshold = self.config['THRESHOLD']):
+		with torch.no_grad():
+			self.model.eval()
+			predictions, scores = testDeepAnt(self.model, self.test_dl, self.criterion, self.device)
+		return predictions, scores
 
 
 
@@ -111,4 +116,14 @@ def deepAntEpoch(model: DeepAnt, loader: DataLoader, criterion, optimizer, devic
 		optimizer.step()
 	return curr_loss/len(loader)
 
-
+def testDeepAnt(model: DeepAnt, loader: DataLoader, criterion, device):
+	scores = []
+	predictions = []
+	for i, (batch, batch_labels) in enumerate(loader):
+		batch = batch.to(device).permute(0,-1,1)
+		batch_labels = batch_labels.to(device)
+		output = model(batch)
+		score = torch.linalg.norm(output - batch_labels)
+		predictions.append(output.cpu().numpy())
+		scores.append(score.cpu().item())
+	return predictions, scores
