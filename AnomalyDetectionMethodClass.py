@@ -14,6 +14,7 @@ from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader
 from models import DeepAnt
 from datafactory import MyDataset
+from sklearn.metrics import classification_report
 
 
 class ADMethod_back():
