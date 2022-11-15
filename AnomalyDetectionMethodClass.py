@@ -127,7 +127,7 @@ class ADMethod():
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
 		scaler = MinMaxScaler()
-		s = scaler.fit_transform(self.scores)
+		s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
 		self.anomalies = np.array([True if el > threshold else False for el in s])
 		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
 		if self.config['VERBOSE']:
