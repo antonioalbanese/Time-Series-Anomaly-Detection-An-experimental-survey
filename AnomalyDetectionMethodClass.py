@@ -10,7 +10,7 @@ from LSTMEncoderDecoder import LSTMSolver
 from USAD import USADSolver
 
 
-
+from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader
 from models import DeepAnt
 from datafactory import MyDataset
@@ -81,26 +81,58 @@ class ADMethod():
 			self.criterion = torch.nn.L1Loss()
 			
 	def train(self):
-		self.model.to(self.device)
-		self.model.train()
+		if[self.config['VERBOSE']]:
+			print("Training...")
+		
+		### Calling training function based on the model selected
+		if self.name == "DEEPANT":
+			self.model.to(self.device)
+			self.model.train()
 
-		for epoch in range(self.config['EPOCHS']):
-			epoch_loss = deepAntEpoch(self.model, self.train_dl, self.criterion, self.optimizer, self.device)
-			if self.config['VERBOSE']:
-				print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
+			for epoch in range(self.config['EPOCHS']):
+				epoch_loss = deepAntEpoch(self.model, self.train_dl, self.criterion, self.optimizer, self.device)
+				if self.config['VERBOSE']:
+					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
+
+
 		if self.config['VERBOSE']:
-			print("training finished")
+			print("Training finished")
 
 	def test(self):
+		if[self.config['VERBOSE']]:
+			print("Testing...")
+
 		with torch.no_grad():
-			self.model.eval()
-			self.model.to(self.device)
-			predictions, scores = testDeepAnt(self.model, self.test_dl, self.criterion, self.device)
-		return predictions, scores
+			### Calling testing function based on the model selected
+			if self.name == "DEEPANT":
+				self.model.eval()
+				self.model.to(self.device)
+				self.predictions, self.scores = testDeepAnt(self.model, self.test_dl, self.criterion, self.device)
+		
+		if[self.config['VERBOSE']]:
+			print("Test finished")
+		return self.predictions, self.scores
 
 
-
-
+	def results(self, threshold: float):
+		if self.config['VERBOSE']:
+			print("Computing results... ") 
+		if self.name == "DEEPANT":
+			if self.config['DATASET'] == "SWAT":
+				attack = pd.read_csv("./data/SWAT/SWaT_Dataset_Attack_v0.csv", sep=";")
+				ground_truth = attack.values[:,-1]
+				ground_truth = np.array([False if el == "Normal" else True for el in ground_truth])
+				window_size = self.config['SEQ_LEN']
+				step = self.config['STEP']
+				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
+				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
+		scaler = MinMaxScaler()
+		s = scaler.fit_transform(self.scores)
+		self.anomalies = np.array([True if el > threshold else False for el in s])
+		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
+		if self.config['VERBOSE']:
+			print(classification_report(self.ground, self.anomalies, output_dict=False))
+		return self.report
 
 
 
