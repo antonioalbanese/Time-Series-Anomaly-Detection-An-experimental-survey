@@ -79,7 +79,7 @@ class ADMethod():
 			self.model = DeepAnt(n_features = self.train_ds.n_features, seq_len = self.config['SEQ_LEN'])
 			self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.config['LR'], momentum=0.9)
 			self.criterion = torch.nn.L1Loss()
-			optim.lr_scheduler.MultiStepLR(self.optimizer, milestones=self.config['MILESTONES'], gamma=0.2)
+			self.lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(self.optimizer, milestones=self.config['MILESTONES'], gamma=0.2)
 	
 	def train(self):
 		self.model.to(self.device)
