@@ -133,7 +133,7 @@ class ADMethod():
 					j_label = json.load(FI)
 				key = self.config['DATAPATH']
 				windows = j_label[key]
-				df = pd.read_csv(data_path)
+				df = pd.read_csv(self.config['DATAPATH'])
 				df['timestamp'] = pd.to_datetime(df['timestamp'])
 				ground_truth = np.zeros(len(df))
 				for w in windows:
