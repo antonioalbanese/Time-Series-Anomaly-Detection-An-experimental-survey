@@ -9,6 +9,7 @@ class MyDataset(Dataset):
     def __init__(self, dataset: str, data_path: str, seq_len: int, step: int, method: str, mode: str):
         self.seq_len = seq_len
         self.dataset = dataset
+        self.data_path = data_path
         if dataset == 'NAB' and (data_path == "" or data_path == None):
             sys.exit('When dataset is NAB, data_path must have a path to the dataset to be used')
         self.method = method
@@ -52,18 +53,35 @@ class MyDataset(Dataset):
                 ### window test data
                 self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
                 self.n_sequences = self.sequences.shape[0]
-
             ### create labels if method is DeepAnt    
             if self.method == "DEEPANT":
                 self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
 
         elif self.dataset == 'MSL':
             pass
+
         elif self.dataset == 'SMD':
             pass
-        elif self.dataset == 'NAB':
-            pass
 
+        elif self.dataset == 'NAB':
+            print("NAB DS")
+            """
+            NAB DATASET MUST BE IN ./NAB/*datasets*/*file.csv*
+            data_path MUST CONTAIN *datasets*/*file.csv* ONLY PART TO LOAD LABELS LATER
+            """
+            ### ! mode IS NOT NEEDED FOR NUMENTA AS WE WILL USE THE SAME DATASET FOR TRAINING AND TEST
+            data = pd.read_csv("./NAB/" + self.data_path)
+            data = data.drop(["timestamp"] , axis = 1)
+            data = pd.DataFrame(scaler.fit_transform(data.values))
+            self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
+            self.n_sequences = self.sequences.shape[0]
+            self.n_features = data.values.shape[-1]
+            print("FEAT: ", self.n_features)
+            ### create labels if method is DeepAnt  
+            if self.method == "DEEPANT":
+                self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
+
+            
     def __len__(self):
         return self.n_sequences
     

@@ -119,14 +119,33 @@ class ADMethod():
 		if self.config['VERBOSE']:
 			print("Computing results... ") 
 		if self.name == "DEEPANT":
+			window_size = self.config['SEQ_LEN']
+			step = self.config['STEP']
 			if self.config['DATASET'] == "SWAT":
 				attack = pd.read_csv("./data/SWAT/SWaT_Dataset_Attack_v0.csv", sep=";")
 				ground_truth = attack.values[:,-1]
 				ground_truth = np.array([False if el == "Normal" else True for el in ground_truth])
-				window_size = self.config['SEQ_LEN']
-				step = self.config['STEP']
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
+			elif self.config['DATASET'] == 'NAB':
+				with open("./NAB/combined_windows.json") as FI:
+					j_label = json.load(FI)
+				key = self.config['DATAPATH']
+				windows = j_label[key]
+				df = pd.read_csv(data_path)
+				df['timestamp'] = pd.to_datetime(df['timestamp'])
+				ground_truth = np.zeros(len(df))
+				for w in windows:
+					start = pd.to_datetime(w[0])
+					end = pd.to_datetime(w[1])
+					for idx in df.index:
+						if df.loc[idx, 'timestamp'] >= start and df.loc[idx, 'timestamp'] <= end:
+							ground_truth[idx] = True
+						else: 
+							ground_truth[idx] = False
+				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
+				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
+
 		scaler = MinMaxScaler()
 		s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
 		self.anomalies = np.array([True if el > threshold else False for el in s])
