@@ -135,15 +135,13 @@ class ADMethod():
 				windows = j_label[key]
 				df = pd.read_csv("./NAB/" + self.config['DATAPATH'])
 				df['timestamp'] = pd.to_datetime(df['timestamp'])
-				ground_truth = np.zeros(len(df))
+				ground_truth = np.zeros(len(df), dtype=bool)
 				for w in windows:
 					start = pd.to_datetime(w[0])
 					end = pd.to_datetime(w[1])
 					for idx in df.index:
 						if df.loc[idx, 'timestamp'] >= start and df.loc[idx, 'timestamp'] <= end:
 							ground_truth[idx] = True
-						else: 
-							ground_truth[idx] = False
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
 
