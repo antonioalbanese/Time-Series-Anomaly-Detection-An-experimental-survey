@@ -173,7 +173,8 @@ class ADMethod():
 			fig.update_layout(plot_bgcolor="white")
 			fig.update_xaxes(showgrid=False, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
 			fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
-
+			fig.show()
+			
 		return self.report
 
 
