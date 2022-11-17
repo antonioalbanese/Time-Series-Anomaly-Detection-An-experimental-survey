@@ -65,14 +65,14 @@ class MyDataset(Dataset):
                 #load the training data
                 data = np.load("./data/MSL/MSL_train.npy")
                 #scale data
-                data = pd.DataFrame(scaler.fit_transform(data.values))
+                data = pd.DataFrame(scaler.fit_transform(data))
                 #window train data
                 self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
                 self.n_sequences = self.sequences.shape[0]
                 self.n_features = data.values.shape[-1]
             elif self.mode == 'TEST':
                 data = np.load("./data/MSL/MSL_test.npy")
-                data = pd.DataFrame(scaler.fit_transform(data.values))
+                data = pd.DataFrame(scaler.fit_transform(data))
                 ### window test data
                 self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
                 self.n_sequences = self.sequences.shape[0]
