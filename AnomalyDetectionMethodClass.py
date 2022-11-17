@@ -128,7 +128,7 @@ class ADMethod():
 				ground_truth = np.array([False if el == "Normal" else True for el in ground_truth])
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
-			elif self.config['DATASET'] == 'NAB':
+			elif self.config['DATASET'] == "NAB":
 				with open("./NAB/combined_windows.json") as FI:
 					j_label = json.load(FI)
 				key = self.config['DATAPATH']
@@ -142,6 +142,10 @@ class ADMethod():
 					for idx in df.index:
 						if df.loc[idx, 'timestamp'] >= start and df.loc[idx, 'timestamp'] <= end:
 							ground_truth[idx] = True
+				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
+				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
+			elif self.config['DATASET'] == "MSL":
+				ground_truth = np.load("./data/MSL/MSL_test_label.npy")
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
 

@@ -53,12 +53,33 @@ class MyDataset(Dataset):
                 ### window test data
                 self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
                 self.n_sequences = self.sequences.shape[0]
+                self.n_features = data.values.shape[-1]
             ### create labels if method is DeepAnt    
             if self.method == "DEEPANT":
                 self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
 
         elif self.dataset == 'MSL':
-            pass
+            """SWAT DATASET MUST BE DOWNLOADED IN data/MSL
+            DATAPATH is not needed"""
+            if self.mode == "TRAIN":
+                #load the training data
+                data = np.load("./data/MSL/MSL_train.npy")
+                #scale data
+                data = pd.DataFrame(scaler.fit_transform(data.values))
+                #window train data
+                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
+                self.n_sequences = self.sequences.shape[0]
+                self.n_features = data.values.shape[-1]
+            elif self.mode == 'TEST':
+                data = np.load("./data/MSL/MSL_test.npy")
+                data = pd.DataFrame(scaler.fit_transform(data.values))
+                ### window test data
+                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
+                self.n_sequences = self.sequences.shape[0]
+                self.n_features = data.values.shape[-1]
+            ### create labels if method is DeepAnt    
+            if self.method == "DEEPANT":
+                self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
 
         elif self.dataset == 'SMD':
             pass
@@ -72,6 +93,7 @@ class MyDataset(Dataset):
             ### ! mode IS NOT NEEDED FOR NUMENTA AS WE WILL USE THE SAME DATASET FOR TRAINING AND TEST
             data = pd.read_csv("./NAB/" + self.data_path)
             data = data.drop(["timestamp"] , axis = 1)
+            data = pd.DataFrame(scaler.fit_transform(data.values))
             data = pd.DataFrame(scaler.fit_transform(data.values))
             self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
             self.n_sequences = self.sequences.shape[0]
