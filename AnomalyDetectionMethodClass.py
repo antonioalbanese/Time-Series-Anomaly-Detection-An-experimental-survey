@@ -116,7 +116,7 @@ class ADMethod():
 		return self.predictions, self.scores
 
 
-	def results(self, threshold: float):
+	def results(self, threshold: float, plot: bool):
 		if self.config['VERBOSE']:
 			print("Computing results... ") 
 		if self.name == "DEEPANT":
@@ -155,6 +155,23 @@ class ADMethod():
 		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
 		if self.config['VERBOSE']:
 			print(classification_report(self.ground, self.anomalies, output_dict=False))
+		if plot:
+			s_scaled = s.reshape(-1)
+			tp = np.logical_and(np.array(s_scaled) >= threshold,  method.ground == True)
+			fn = np.logical_and(np.array(s_scaled) < threshold,  method.ground == True)
+			fp = np.logical_and(np.array(s_scaled) >= threshold,  method.ground == False)
+
+
+			fig = go.Figure()
+			fig.add_hline(y=threshold, line_color="#aaaaaa", name="threshold", line_dash="dash")
+			fig.add_trace(go.Scatter(x=np.arange(len(s)), y=s_scaled, mode='lines', name='Anomaly score', line_color="#515ad6"))
+			fig.add_trace(go.Scatter(x=np.arange(len(s))[tp], y=method.ground[tp]*s_scaled[tp], mode='markers', name='True positives', line_color="green"))
+			fig.add_trace(go.Scatter(x=np.arange(len(s))[fn], y=method.ground[fn]*threshold, mode='markers', name='False negatives', line_color="red"))
+			fig.add_trace(go.Scatter(x=np.arange(len(s))[fp], y=s_scaled[fp], mode='markers', name='False positives', line_color="#000000", marker=dict(size=10, symbol=34, line=dict(width=2))))
+			fig.update_layout(plot_bgcolor="white")
+			fig.update_xaxes(showgrid=False, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
+			fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
+
 		return self.report
 
 
