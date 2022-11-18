@@ -18,6 +18,8 @@ from sklearn.metrics import classification_report
 import json
 import plotly.express as px
 import plotly.graph_objects as go
+import time
+from torchinfo import summary
 
 
 class ADMethod_back():
@@ -64,6 +66,10 @@ class ADMethod():
 		self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 		self.name = name
 		self.config = config
+		if self.config['VERBOSE']:
+			print("=====================================================================")
+			print("Initializing...")
+		start_time = time.time()
 		self.train_ds = MyDataset(dataset=self.config['DATASET'], 
 								  data_path=self.config['DATAPATH'], 
 								  seq_len= self.config['SEQ_LEN'], 
@@ -83,12 +89,20 @@ class ADMethod():
 			self.model = DeepAnt(n_features = self.train_ds.n_features, seq_len = self.config['SEQ_LEN'])
 			self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.config['LR'], momentum=0.9)
 			self.criterion = torch.nn.L1Loss()
+		end_time = time.time()
+		elapsed = end_time - start_time
+		if self.config['VERBOSE']:
+			print(f"Data preprocessing and method configuration finished in {elapsed} sec.")
+			print("Model summary: ")
+			print(summary(self.model))
 			
 	def train(self):
 		if[self.config['VERBOSE']]:
+			print("=====================================================================")
 			print("Training...")
-		
+		start_time = time.time()
 		### Calling training function based on the model selected
+		train_losses = []
 		if self.name == "DEEPANT":
 			self.model.to(self.device)
 			self.model.train()
@@ -97,29 +111,37 @@ class ADMethod():
 				epoch_loss = deepAntEpoch(self.model, self.train_dl, self.criterion, self.optimizer, self.device)
 				if self.config['VERBOSE']:
 					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
-
-
+				train_losses.append([epoch_loss])
+		end_time = time.time()
+		total_elapsed = end_time - start_time
 		if self.config['VERBOSE']:
-			print("Training finished")
+			print(f"Training finished in {total_elapsed} sec., avg time per epoch: {total_elapsed/self.config['EPOCHS']} sec.")
+			print("=====================================================================")
+		
+		return np.array(train_losses)
 
 	def test(self):
 		if[self.config['VERBOSE']]:
+			print("=====================================================================")
 			print("Testing...")
-
+		start_time = time.time()
 		with torch.no_grad():
 			### Calling testing function based on the model selected
 			if self.name == "DEEPANT":
 				self.model.eval()
 				self.model.to(self.device)
 				self.predictions, self.scores = testDeepAnt(self.model, self.test_dl, self.criterion, self.device)
-		
+		end_time = time.time()
+		total_elapsed = end_time - start_time
 		if[self.config['VERBOSE']]:
-			print("Test finished")
+			print(f"Test finished in {total_elapsed} sec.")
+			print("=====================================================================")
 		return self.predictions, self.scores
 
 
 	def results(self, threshold: float, plot: bool):
 		if self.config['VERBOSE']:
+			print("=====================================================================")
 			print("Computing results... ") 
 		if self.name == "DEEPANT":
 			window_size = self.config['SEQ_LEN']
