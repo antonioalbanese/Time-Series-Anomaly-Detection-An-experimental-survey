@@ -59,7 +59,7 @@ class MyDataset(Dataset):
                 self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
 
         elif self.dataset == 'MSL':
-            """SWAT DATASET MUST BE DOWNLOADED IN data/MSL
+            """MSL DATASET MUST BE DOWNLOADED IN data/MSL
             DATAPATH is not needed"""
             if self.mode == "TRAIN":
                 #load the training data
@@ -82,7 +82,27 @@ class MyDataset(Dataset):
                 self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
 
         elif self.dataset == 'SMD':
-            pass
+            """SMD DATASET MUST BE DOWNLOADED IN data/MSL
+            DATAPATH is not needed"""
+            if self.mode == "TRAIN":
+                #load the training data
+                data = np.load("./data/SMD/SMD_train.npy")
+                #scale data
+                data = pd.DataFrame(scaler.fit_transform(data))
+                #window train data
+                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
+                self.n_sequences = self.sequences.shape[0]
+                self.n_features = data.values.shape[-1]
+            elif self.mode == 'TEST':
+                data = np.load("./data/SMD/SMD_test.npy")
+                data = pd.DataFrame(scaler.fit_transform(data))
+                ### window test data
+                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
+                self.n_sequences = self.sequences.shape[0]
+                self.n_features = data.values.shape[-1]
+            ### create labels if method is DeepAnt    
+            if self.method == "DEEPANT":
+                self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
 
         elif self.dataset == 'NAB':
             print("NAB DS")

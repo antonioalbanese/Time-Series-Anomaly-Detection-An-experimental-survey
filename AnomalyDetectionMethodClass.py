@@ -150,6 +150,10 @@ class ADMethod():
 				ground_truth = np.load("./data/MSL/MSL_test_label.npy")
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
+			elif self.config['DATASET'] == "SMD":
+				ground_truth = np.load("./data/SMD/SMD_test_label.npy")
+				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
+				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
 
 		scaler = MinMaxScaler()
 		s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
@@ -174,7 +178,7 @@ class ADMethod():
 			fig.update_xaxes(showgrid=False, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
 			fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
 			fig.show()
-			
+
 		return self.report
 
 
