@@ -94,7 +94,7 @@ class ADMethod():
 
 		if self.name == 'USAD':
 			self.w_size, self.z_size = self.train_ds.get_sizes()
-			self.model = UsadModel(in_size = self.w_size, latent_size = self.z_size)
+			self.model = UsadModel(w_size = self.w_size, z_size = self.z_size)
 			self.optimizer1 = torch.optim.Adam(list(self.model.encoder.parameters())+list(self.model.decoder1.parameters()))
 			self.optimizer2 = torch.optim.Adam(list(self.model.encoder.parameters())+list(self.model.decoder2.parameters()))
 			
