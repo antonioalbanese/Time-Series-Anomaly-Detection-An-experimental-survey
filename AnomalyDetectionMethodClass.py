@@ -75,13 +75,15 @@ class ADMethod():
 								  seq_len= self.config['SEQ_LEN'], 
 								  step=self.config['STEP'], 
 								  method= self.name, 
-								  mode='TRAIN')
+								  mode='TRAIN',
+								 hidden_size = self.config['HIDDEN_SIZE'])
 		self.test_ds = MyDataset(dataset=self.config['DATASET'], 
 								 data_path=self.config['DATAPATH'], 
 								 seq_len= self.config['SEQ_LEN'], 
 								 step=self.config['STEP'], 
 								 method= self.name,
-								 mode='TEST')
+								 mode='TEST',
+								 hidden_size = self.config['HIDDEN_SIZE'])
 		self.train_dl = DataLoader(self.train_ds, batch_size = 256, num_workers = 4, shuffle = False)
 		self.test_dl = DataLoader(self.test_ds, batch_size = 1, num_workers = 4, shuffle = False)
 		
@@ -91,7 +93,8 @@ class ADMethod():
 			self.criterion = torch.nn.L1Loss()
 
 		if self.name == 'USAD':
-			self.model = UsadModel(n_features = self.train_ds.n_features, seq_len = self.config['SEQ_LEN'])
+			self.w_size, self.z_size = train_ds.get_sizes()
+			self.model = UsadModel(in_size = self.w_size, latent_size = self.z_size)
 			self.optimizer1 = torch.optim.Adam(list(self.model.encoder.parameters())+list(self.model.decoder1.parameters()))
 			self.optimizer2 = torch.optim.Adam(list(self.model.encoder.parameters())+list(self.model.decoder2.parameters()))
 			

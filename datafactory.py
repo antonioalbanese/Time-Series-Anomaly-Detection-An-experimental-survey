@@ -6,15 +6,19 @@ import sklearn
 from sklearn.preprocessing import MinMaxScaler
 
 class MyDataset(Dataset):
-    def __init__(self, dataset: str, data_path: str, seq_len: int, step: int, method: str, mode: str):
+    def __init__(self, dataset: str, data_path: str, seq_len: int, step: int, method: str, mode: str, hidden_size: int):
+        if dataset == 'NAB' and (data_path == "" or data_path == None):
+            sys.exit('When dataset is NAB, data_path must have a path to the dataset to be used')
+        if method == "USA" and hidden_size == None:
+            sys.exit('USAD method need HIDDEN_SIZE as hyperparameter')
+        
         self.seq_len = seq_len
         self.dataset = dataset
         self.data_path = data_path
-        if dataset == 'NAB' and (data_path == "" or data_path == None):
-            sys.exit('When dataset is NAB, data_path must have a path to the dataset to be used')
         self.method = method
         self.mode = mode
         self.step = step
+        self.hidden_size = hidden_size
 
 
 
@@ -51,13 +55,12 @@ class MyDataset(Dataset):
                 data = data.astype(float)
                 data = pd.DataFrame(scaler.fit_transform(data.values))
                 ### window test data
-                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
+                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]] ##[n_sequences, window_size, features]
                 self.n_sequences = self.sequences.shape[0]
                 self.n_features = data.values.shape[-1]
             ### create labels if method is DeepAnt    
             if self.method == "DEEPANT":
                 self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
-
         elif self.dataset == 'MSL':
             """MSL DATASET MUST BE DOWNLOADED IN data/MSL
             DATAPATH is not needed"""
@@ -123,7 +126,13 @@ class MyDataset(Dataset):
             if self.method == "DEEPANT":
                 self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
 
-            
+        if self.method == 'USAD':
+            self.w_size = self.n_features*self.seq_len
+            self.z_size = self.seq_len*self.hidden_size
+    
+    def get_sizes(self):
+        return self.w_size, self.z_size
+
     def __len__(self):
         return self.n_sequences
     
