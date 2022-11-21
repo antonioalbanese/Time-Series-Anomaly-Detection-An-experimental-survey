@@ -336,7 +336,7 @@ def UsadEpoch(model: UsadModel, loader: DataLoader, optimizer1, optimizer2, epoc
 
 	return curr_loss1/len(loader), curr_loss2/len(loader)
 
-def testUsad(model: UsadModel, loader: DataLoader, device):
+def testUsad(model: UsadModel, loader: DataLoader, device, alpha = 0.5, beta=0.5):
 	with torch.no_grad():
 		r = []
 		for [batch] in loader:
