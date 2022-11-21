@@ -141,6 +141,6 @@ class MyDataset(Dataset):
             return (torch.tensor(self.sequences[idx], dtype=torch.float),
                     torch.tensor(self.labels[idx].reshape(self.labels[idx].shape[-1]), dtype = torch.float))
         elif self.method == 'USAD':
-            return torch.tensor(self.sequences[idx]).view(([-1, self.w_size]))
+            return torch.tensor(self.sequences[idx], dtype = torch.float).view(([self.w_size]))
         else: 
             return torch.tensor(self.sequences[idx], dtype = torch.float)
