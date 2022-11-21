@@ -93,7 +93,7 @@ class ADMethod():
 			self.criterion = torch.nn.L1Loss()
 
 		if self.name == 'USAD':
-			self.w_size, self.z_size = train_ds.get_sizes()
+			self.w_size, self.z_size = self.train_ds.get_sizes()
 			self.model = UsadModel(in_size = self.w_size, latent_size = self.z_size)
 			self.optimizer1 = torch.optim.Adam(list(self.model.encoder.parameters())+list(self.model.decoder1.parameters()))
 			self.optimizer2 = torch.optim.Adam(list(self.model.encoder.parameters())+list(self.model.decoder2.parameters()))
