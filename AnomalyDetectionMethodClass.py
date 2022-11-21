@@ -12,7 +12,7 @@ from USAD import USADSolver
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader
-from models import DeepAnt, USadModel
+from models import DeepAnt, UsadModel
 from datafactory import MyDataset
 from sklearn.metrics import classification_report
 import json
