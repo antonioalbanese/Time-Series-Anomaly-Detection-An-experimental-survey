@@ -123,7 +123,7 @@ class ADMethod():
 				if self.config['VERBOSE']:
 					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
 				train_losses.append([epoch_loss])
-			train_history['TRAIN_LOSSES'] = train_losses
+			train_history['TRAIN_LOSSES'] = np.array(train_losses)
 		if self.name == "USAD":
 			train_losses1 = []
 			train_losses2 = []
@@ -136,8 +136,8 @@ class ADMethod():
 					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss_1:{epoch_loss1}. train_loss_2:{epoch_loss2}")
 				train_losses1.append([epoch_loss1])
 				train_losses2.append([epoch_loss2])
-			train_history['TRAIN_LOSSES_1'] = train_losses1
-			train_history['TRAIN_LOSSES_2'] = train_losses2
+			train_history['TRAIN_LOSSES_1'] = np.array(train_losses1)
+			train_history['TRAIN_LOSSES_2'] = np.array(train_losses2)
 
 		end_time = time.time()
 		total_elapsed = end_time - start_time
@@ -145,7 +145,7 @@ class ADMethod():
 			print(f"Training finished in {total_elapsed} sec., avg time per epoch: {total_elapsed/self.config['EPOCHS']} sec.")
 			print("=====================================================================")
 		
-		return np.array(train_losses1), np.array(train_losses2)
+		return train_history
 
 	def test(self):
 		if[self.config['VERBOSE']]:
@@ -160,6 +160,7 @@ class ADMethod():
 				self.predictions, self.scores = testDeepAnt(self.model, self.test_dl, self.criterion, self.device)
 			
 			if self.name == "USAD":
+				self.predictions = None #USAD does not return predictions, only returns anomaly scores
 				self.model.eval()
 				self.model.to(self.device)
 				self.scores = testUsad(self.model, self.test_dl, self.device)
@@ -289,15 +290,16 @@ def deepAntEpoch(model: DeepAnt, loader: DataLoader, criterion, optimizer, devic
 	return curr_loss/len(loader)
 
 def testDeepAnt(model: DeepAnt, loader: DataLoader, criterion, device):
-	scores = []
-	predictions = []
-	for i, (batch, batch_labels) in enumerate(loader):
-		batch = batch.to(device).permute(0,-1,1)
-		batch_labels = batch_labels.to(device)
-		output = model(batch)
-		score = torch.linalg.norm(output - batch_labels)
-		predictions.append(output.cpu().numpy())
-		scores.append(score.cpu().item())
+	with torch.no_grad():
+		scores = []
+		predictions = []
+		for i, (batch, batch_labels) in enumerate(loader):
+			batch = batch.to(device).permute(0,-1,1)
+			batch_labels = batch_labels.to(device)
+			output = model(batch)
+			score = torch.linalg.norm(output - batch_labels)
+			predictions.append(output.cpu().numpy())
+			scores.append(score.cpu().item())
 	return predictions, scores
 
 
@@ -335,14 +337,15 @@ def UsadEpoch(model: UsadModel, loader: DataLoader, optimizer1, optimizer2, epoc
 	return curr_loss1/len(loader), curr_loss2/len(loader)
 
 def testUsad(model: UsadModel, loader: DataLoader, device):
-	r = []
-	for [batch] in loader:
-		batch= batch.to(device)
-		w1=model.decoder1(model.encoder(batch)).to('cpu')
-		w2=model.decoder2(model.encoder(w1.to(device))).to('cpu')
-		r.append((alpha*torch.mean((batch.to('cpu')-w1)**2,axis=1)+beta*torch.mean((batch.to('cpu')-w2)**2,axis=1)).to('cpu'))
-	
-	scores = np.concatenate([torch.stack(r[:-1]).flatten().detach().cpu().numpy(),
-						r[-1].flatten().detach().cpu().numpy()])
-	
+	with torch.no_grad():
+		r = []
+		for [batch] in loader:
+			batch= batch.to(device)
+			w1=model.decoder1(model.encoder(batch)).to('cpu')
+			w2=model.decoder2(model.encoder(w1.to(device))).to('cpu')
+			r.append((alpha*torch.mean((batch.to('cpu')-w1)**2,axis=0)+beta*torch.mean((batch.to('cpu')-w2)**2,axis=0)).to('cpu'))
+		
+		scores = np.concatenate([torch.stack(r[:-1]).flatten().detach().cpu().numpy(),
+							r[-1].flatten().detach().cpu().numpy()])
+		
 	return scores
