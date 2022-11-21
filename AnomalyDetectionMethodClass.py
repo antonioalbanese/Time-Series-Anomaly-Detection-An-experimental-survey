@@ -12,7 +12,7 @@ from USAD import USADSolver
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader
-from models import DeepAnt
+from models import DeepAnt, USadModel
 from datafactory import MyDataset
 from sklearn.metrics import classification_report
 import json
@@ -89,6 +89,13 @@ class ADMethod():
 			self.model = DeepAnt(n_features = self.train_ds.n_features, seq_len = self.config['SEQ_LEN'])
 			self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.config['LR'], momentum=0.9)
 			self.criterion = torch.nn.L1Loss()
+
+		if self.name == 'USAD':
+			self.model = UsadModel(n_features = self.train_ds.n_features, seq_len = self.config['SEQ_LEN'])
+			self.optimizer1 = torch.optim.Adam(list(self.model.encoder.parameters())+list(self.model.decoder1.parameters()))
+			self.optimizer2 = torch.optim.Adam(list(self.model.encoder.parameters())+list(self.model.decoder2.parameters()))
+			
+
 		end_time = time.time()
 		elapsed = end_time - start_time
 		if self.config['VERBOSE']:
@@ -101,9 +108,9 @@ class ADMethod():
 			print("=====================================================================")
 			print("Training...")
 		start_time = time.time()
-		### Calling training function based on the model selected
-		train_losses = []
+		### Calling training function based on the model selected+
 		if self.name == "DEEPANT":
+			train_losses = []
 			self.model.to(self.device)
 			self.model.train()
 
@@ -112,13 +119,25 @@ class ADMethod():
 				if self.config['VERBOSE']:
 					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
 				train_losses.append([epoch_loss])
+		if self.name == "USAD":
+			train_losses1 = []
+			train_losses2 = []
+			self.model.to(self.device)
+			self.model.train()
+
+			for epoch in range(self.config['EPOCHS']):
+				epoch_loss1, epoch_loss2 = UsadEpoch(self.model, self.train_dl, self.optimizer1, self.optimizer2, self.device)
+				if self.config['VERBOSE']:
+					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
+				train_losses1.append([epoch_loss1])
+				train_losses2.append([epoch_loss2])
 		end_time = time.time()
 		total_elapsed = end_time - start_time
 		if self.config['VERBOSE']:
 			print(f"Training finished in {total_elapsed} sec., avg time per epoch: {total_elapsed/self.config['EPOCHS']} sec.")
 			print("=====================================================================")
 		
-		return np.array(train_losses)
+		return np.array(train_losses1), np.array(train_losses2)
 
 	def test(self):
 		if[self.config['VERBOSE']]:
@@ -131,6 +150,14 @@ class ADMethod():
 				self.model.eval()
 				self.model.to(self.device)
 				self.predictions, self.scores = testDeepAnt(self.model, self.test_dl, self.criterion, self.device)
+			
+			if self.name == "USAD":
+				self.model.eval()
+				self.model.to(self.device)
+				self.scores = testUsad(self.model, self.test_dl, self.device)
+
+
+
 		end_time = time.time()
 		total_elapsed = end_time - start_time
 		if[self.config['VERBOSE']]:
@@ -176,6 +203,41 @@ class ADMethod():
 				ground_truth = np.load("./data/SMD/SMD_test_label.npy")
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
+
+		if self.name == "USAD":
+			window_size = self.config['SEQ_LEN']
+			step = self.config['STEP']
+			if self.config['DATASET'] == "SWAT":
+				attack = pd.read_csv("./data/SWAT/SWaT_Dataset_Attack_v0.csv", sep=";")
+				ground_truth = attack.values[:,-1]
+				ground_truth = np.array([False if el == "Normal" else True for el in ground_truth])
+				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
+				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
+			elif self.config['DATASET'] == "NAB":
+				with open("./NAB/combined_windows.json") as FI:
+					j_label = json.load(FI)
+				key = self.config['DATAPATH']
+				windows = j_label[key]
+				df = pd.read_csv("./NAB/" + self.config['DATAPATH'])
+				df['timestamp'] = pd.to_datetime(df['timestamp'])
+				ground_truth = np.zeros(len(df), dtype=bool)
+				for w in windows:
+					start = pd.to_datetime(w[0])
+					end = pd.to_datetime(w[1])
+					for idx in df.index:
+						if df.loc[idx, 'timestamp'] >= start and df.loc[idx, 'timestamp'] <= end:
+							ground_truth[idx] = True
+				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
+				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
+			elif self.config['DATASET'] == "MSL":
+				ground_truth = np.load("./data/MSL/MSL_test_label.npy")
+				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
+				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
+			elif self.config['DATASET'] == "SMD":
+				ground_truth = np.load("./data/SMD/SMD_test_label.npy")
+				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
+				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
+
 
 		scaler = MinMaxScaler()
 		s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
@@ -229,3 +291,50 @@ def testDeepAnt(model: DeepAnt, loader: DataLoader, criterion, device):
 		predictions.append(output.cpu().numpy())
 		scores.append(score.cpu().item())
 	return predictions, scores
+
+
+def UsadEpoch(model: USadModel, loader: DataLoader, optimizer1, optimizer2, epoch, device):
+	n = epoch+1
+	curr_loss1 = 0
+	curr_loss2 = 0
+	for idx, batch in enumerate(loader):
+		batch = batch.to(device).permute(0,-1,1)
+
+		#Train AE1
+		z = model.encoder(batch)
+		w1 = model.decoder1(z)
+		w2 = model.decoder2(z)
+		w3 = model.decoder2(self.encoder(w1))
+		loss1 = 1/n*torch.mean((batch-w1)**2)+(1-1/n)*torch.mean((batch-w3)**2)
+		loss2 = 1/n*torch.mean((batch-w2)**2)-(1-1/n)*torch.mean((batch-w3)**2)
+		curr_loss1 += loss1.item()
+		loss1.backward()
+		optimizer1.step()
+		optimizer1.zero_grad()
+
+		#Train AE2
+		z = model.encoder(batch)
+		w1 = model.decoder1(z)
+		w2 = model.decoder2(z)
+		w3 = model.decoder2(self.encoder(w1))
+		loss1 = 1/n*torch.mean((batch-w1)**2)+(1-1/n)*torch.mean((batch-w3)**2)
+		loss2 = 1/n*torch.mean((batch-w2)**2)-(1-1/n)*torch.mean((batch-w3)**2)	
+		curr_loss2 += loss2.item()
+		loss2.backward()
+		optimizer2.step()
+		optimizer2.zero_grad()
+
+	return curr_loss1/len(loader), curr_loss2/len(loader)
+
+def testUsad(model: UsadModel, loader: DataLoader, device):
+	r = []
+	for [batch] in loader:
+		batch= batch.to(device)
+		w1=model.decoder1(model.encoder(batch)).to('cpu')
+		w2=model.decoder2(model.encoder(w1.to(device))).to('cpu')
+		r.append((alpha*torch.mean((batch.to('cpu')-w1)**2,axis=1)+beta*torch.mean((batch.to('cpu')-w2)**2,axis=1)).to('cpu'))
+	
+	scores = np.concatenate([torch.stack(r[:-1]).flatten().detach().cpu().numpy(),
+						r[-1].flatten().detach().cpu().numpy()])
+	
+	return scores
