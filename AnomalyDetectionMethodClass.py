@@ -107,6 +107,7 @@ class ADMethod():
 			print(summary(self.model))
 			
 	def train(self):
+		train_history={}
 		if[self.config['VERBOSE']]:
 			print("=====================================================================")
 			print("Training...")
@@ -122,6 +123,7 @@ class ADMethod():
 				if self.config['VERBOSE']:
 					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
 				train_losses.append([epoch_loss])
+			train_history['TRAIN_LOSSES'] = train_losses
 		if self.name == "USAD":
 			train_losses1 = []
 			train_losses2 = []
@@ -129,11 +131,14 @@ class ADMethod():
 			self.model.train()
 
 			for epoch in range(self.config['EPOCHS']):
-				epoch_loss1, epoch_loss2 = UsadEpoch(self.model, self.train_dl, self.optimizer1, self.optimizer2, self.device)
+				epoch_loss1, epoch_loss2 = UsadEpoch(self.model, self.train_dl, self.optimizer1, self.optimizer2, epoch, self.device)
 				if self.config['VERBOSE']:
 					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
 				train_losses1.append([epoch_loss1])
 				train_losses2.append([epoch_loss2])
+			train_history['TRAIN_LOSSES_1'] = train_losses1
+			train_history['TRAIN_LOSSES_2'] = train_losses2
+
 		end_time = time.time()
 		total_elapsed = end_time - start_time
 		if self.config['VERBOSE']:
