@@ -133,7 +133,7 @@ class ADMethod():
 			for epoch in range(self.config['EPOCHS']):
 				epoch_loss1, epoch_loss2 = UsadEpoch(self.model, self.train_dl, self.optimizer1, self.optimizer2, epoch, self.device)
 				if self.config['VERBOSE']:
-					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
+					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss_1:{epoch_loss1}. train_loss_2:{epoch_loss2}")
 				train_losses1.append([epoch_loss1])
 				train_losses2.append([epoch_loss2])
 			train_history['TRAIN_LOSSES_1'] = train_losses1
