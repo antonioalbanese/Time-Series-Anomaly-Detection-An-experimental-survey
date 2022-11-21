@@ -306,7 +306,7 @@ def UsadEpoch(model: UsadModel, loader: DataLoader, optimizer1, optimizer2, epoc
 	curr_loss1 = 0
 	curr_loss2 = 0
 	for idx, batch in enumerate(loader):
-		batch = batch.to(device).permute(0,-1,1)
+		batch = batch.to(device)
 
 		#Train AE1
 		z = model.encoder(batch)
