@@ -293,7 +293,7 @@ def testDeepAnt(model: DeepAnt, loader: DataLoader, criterion, device):
 	return predictions, scores
 
 
-def UsadEpoch(model: USadModel, loader: DataLoader, optimizer1, optimizer2, epoch, device):
+def UsadEpoch(model: UsadModel, loader: DataLoader, optimizer1, optimizer2, epoch, device):
 	n = epoch+1
 	curr_loss1 = 0
 	curr_loss2 = 0
