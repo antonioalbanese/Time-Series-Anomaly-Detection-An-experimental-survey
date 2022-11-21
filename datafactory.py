@@ -127,7 +127,7 @@ class MyDataset(Dataset):
                 self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
 
         if self.method == 'USAD':
-            self.w_size = self.n_features*self.seq_len
+            self.w_size = self.n_features*self.seq_len #shape[2]*shape[1]
             self.z_size = self.seq_len*self.hidden_size
     
     def get_sizes(self):
@@ -140,5 +140,7 @@ class MyDataset(Dataset):
         if self.method == 'DEEPANT':
             return (torch.tensor(self.sequences[idx], dtype=torch.float),
                     torch.tensor(self.labels[idx].reshape(self.labels[idx].shape[-1]), dtype = torch.float))
+        elif self.method == 'USAD':
+            return 
         else: 
             return torch.tensor(self.sequences[idx], dtype = torch.float)

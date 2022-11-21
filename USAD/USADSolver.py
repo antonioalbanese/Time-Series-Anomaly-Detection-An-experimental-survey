@@ -51,7 +51,7 @@ class USADSolver(object):
             window_size = self.config['SEQ_LEN']
             windows_normal=train_data.values[np.arange(window_size)[None, :] + np.arange(train_data.shape[0]-window_size)[:, None]]
             windows_attack=attack.values[np.arange(window_size)[None, :] + np.arange(attack.shape[0]-window_size)[:, None]]
-
+            print(windows_normal.shape)
             ### make dataloader
             BATCH_SIZE = self.config['BATCH_SIZE']
             hidden_size = self.config['HIDDEN_SIZE']
