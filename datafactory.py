@@ -140,3 +140,5 @@ class MyDataset(Dataset):
         if self.method == 'DEEPANT':
             return (torch.tensor(self.sequences[idx], dtype=torch.float),
                     torch.tensor(self.labels[idx].reshape(self.labels[idx].shape[-1]), dtype = torch.float))
+        else: 
+            return torch.tensor(self.sequences[idx], dtype = torch.float)
