@@ -43,7 +43,8 @@ class MyDataset(Dataset):
                 #scale data
                 data = pd.DataFrame(scaler.fit_transform(data.values))
                 #window train data
-                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
+                limit = 0.2*len(data)
+                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,limit-window_size, step)[:, None]]
                 self.n_sequences = self.sequences.shape[0]
                 self.n_features = data.values.shape[-1]
             elif self.mode == 'TEST':
