@@ -251,7 +251,7 @@ class ADMethod():
 
 
 		thresh = np.percentile(self.scores, 100 - self.config['CENTILE'])
-		self.anomalies = np.array([True if el > threshold else False for el in s])
+		self.anomalies = np.array([True if el > threshold else False for el in self.scores])
 		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
 
 		# scaler = MinMaxScaler()
