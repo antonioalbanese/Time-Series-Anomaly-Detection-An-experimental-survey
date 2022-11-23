@@ -250,7 +250,7 @@ class ADMethod():
 
 
 
-		thresh = np.percentile(combined_energy, 100 - self.config['CENTILE'])
+		thresh = np.percentile(self.scores, 100 - self.config['CENTILE'])
 		self.anomalies = np.array([True if el > threshold else False for el in s])
 		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
 
