@@ -29,6 +29,7 @@ class MyDataset(Dataset):
         scaler = MinMaxScaler()
         window_size = self.seq_len
         step = self.step
+        
         if self.dataset == 'SWAT':
             """SWAT DATASET MUST BE DOWNLOADED IN data/SWAT"""
             if self.mode == "TRAIN":
@@ -83,7 +84,6 @@ class MyDataset(Dataset):
             ### create labels if method is DeepAnt    
             if self.method == "DEEPANT":
                 self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
-
         elif self.dataset == 'SMD':
             """SMD DATASET MUST BE DOWNLOADED IN data/MSL
             DATAPATH is not needed"""
@@ -106,7 +106,6 @@ class MyDataset(Dataset):
             ### create labels if method is DeepAnt    
             if self.method == "DEEPANT":
                 self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
-
         elif self.dataset == 'NAB':
             print("NAB DS")
             """
@@ -121,7 +120,6 @@ class MyDataset(Dataset):
             self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
             self.n_sequences = self.sequences.shape[0]
             self.n_features = data.values.shape[-1]
-            print("FEAT: ", self.n_features)
             ### create labels if method is DeepAnt  
             if self.method == "DEEPANT":
                 self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]

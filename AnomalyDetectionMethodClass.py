@@ -248,10 +248,15 @@ class ADMethod():
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
 
 
-		scaler = MinMaxScaler()
-		s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
+
+		thresh = np.percentile(combined_energy, 100 - self.config['CENTILE'])
 		self.anomalies = np.array([True if el > threshold else False for el in s])
 		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
+
+		# scaler = MinMaxScaler()
+		# s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
+		# self.anomalies = np.array([True if el > threshold else False for el in s])
+		# self.report = classification_report(self.ground, self.anomalies, output_dict=True)
 		if self.config['VERBOSE']:
 			print(classification_report(self.ground, self.anomalies, output_dict=False))
 		if plot:
