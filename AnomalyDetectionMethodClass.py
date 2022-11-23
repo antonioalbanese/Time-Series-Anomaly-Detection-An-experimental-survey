@@ -220,7 +220,7 @@ class ADMethod():
 				attack = pd.read_csv("./data/SWAT/SWaT_Dataset_Attack_v0.csv", sep=";")
 				ground_truth = attack.values[:,-1]
 				ground_truth = np.array([False if el == "Normal" else True for el in ground_truth])
-				limit = 0.2*len(ground_truth)
+				limit = int(0.2*len(ground_truth))
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,limit-window_size, step)[:, None]]
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
 			elif self.config['DATASET'] == "NAB":
