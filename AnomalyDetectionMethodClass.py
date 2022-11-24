@@ -262,7 +262,7 @@ class ADMethod():
 			print(classification_report(self.ground, self.anomalies, output_dict=False))
 		if plot:
 			#s_scaled = s.reshape(-1)
-			s_scaled = self.anomalies
+			s_scaled = self.scores
 			tp = np.logical_and(np.array(s_scaled) >= threshold,  self.ground == True)
 			fn = np.logical_and(np.array(s_scaled) < threshold,  self.ground == True)
 			fp = np.logical_and(np.array(s_scaled) >= threshold,  self.ground == False)
