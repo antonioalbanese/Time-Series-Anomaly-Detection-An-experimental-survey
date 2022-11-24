@@ -293,9 +293,9 @@ class ADMethod():
 			print(classification_report(self.ground, self.anomalies, output_dict=False))
 		if plot:
 			s_scaled = s.reshape(-1)
-			tp = np.logical_and(self.anomalies,  self.ground == True)
-			fn = np.logical_and(self.anomalies,  self.ground == True)
-			fp = np.logical_and(self.anomalies,  self.ground == False)
+			tp = np.logical_and(self.anomalies == True,  self.ground == True)
+			fn = np.logical_and(self.anomalies == False,  self.ground == True)
+			fp = np.logical_and(self.anomalies == True,  self.ground == False)
 
 
 			fig = go.Figure()
