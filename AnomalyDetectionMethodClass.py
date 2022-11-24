@@ -147,7 +147,7 @@ class ADMethod():
 		
 		return train_history
 
-	def test(self):
+	def test(self, alphaUSAD: float, betaUSAD: float):
 		if[self.config['VERBOSE']]:
 			print("=====================================================================")
 			print("Testing...")
