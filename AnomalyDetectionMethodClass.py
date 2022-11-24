@@ -257,7 +257,7 @@ class ADMethod():
 		scaler = MinMaxScaler()
 		s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
 		self.anomalies = np.array([True if el > threshold else False for el in s])
-
+		print("Point_adjust")
 		gt = self.ground
 		pred = self.anomalies
 		anomaly_state = False
