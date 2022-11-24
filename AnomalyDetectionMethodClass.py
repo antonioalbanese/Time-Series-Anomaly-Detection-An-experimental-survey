@@ -220,7 +220,7 @@ class ADMethod():
 				attack = pd.read_csv("./data/SWAT/SWaT_Dataset_Attack_v0.csv", sep=";")
 				ground_truth = attack.values[:,-1]
 				ground_truth = np.array([False if el == "Normal" else True for el in ground_truth])
-				limit = int(0.2*len(ground_truth))
+				limit = int(len(ground_truth)*0.6)
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,limit-window_size, step)[:, None]]
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
 			elif self.config['DATASET'] == "NAB":
@@ -250,30 +250,29 @@ class ADMethod():
 
 
 
-		thresh = np.percentile(self.scores, 100 - self.config['CENTILE'])
-		self.anomalies = np.array([True if el > thresh else False for el in self.scores])
-		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
-
-		# scaler = MinMaxScaler()
-		# s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
+		# thresh = np.percentile(combined_energy, 100 - self.config['CENTILE'])
 		# self.anomalies = np.array([True if el > threshold else False for el in s])
 		# self.report = classification_report(self.ground, self.anomalies, output_dict=True)
+
+		scaler = MinMaxScaler()
+		s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
+		self.anomalies = np.array([True if el > threshold else False for el in s])
+		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
 		if self.config['VERBOSE']:
 			print(classification_report(self.ground, self.anomalies, output_dict=False))
 		if plot:
-			#s_scaled = s.reshape(-1)
-			s_scaled = self.scores
-			tp = np.logical_and(np.array(s_scaled) >= thresh,  self.ground == True)
-			fn = np.logical_and(np.array(s_scaled) < thresh,  self.ground == True)
-			fp = np.logical_and(np.array(s_scaled) >= thresh,  self.ground == False)
+			s_scaled = s.reshape(-1)
+			tp = np.logical_and(np.array(s_scaled) >= threshold,  self.ground == True)
+			fn = np.logical_and(np.array(s_scaled) < threshold,  self.ground == True)
+			fp = np.logical_and(np.array(s_scaled) >= threshold,  self.ground == False)
 
 
 			fig = go.Figure()
-			fig.add_hline(y=thresh, line_color="#aaaaaa", name="threshold", line_dash="dash")
-			fig.add_trace(go.Scatter(x=np.arange(len(self.scores)), y=s_scaled, mode='lines', name='Anomaly score', line_color="#515ad6"))
-			fig.add_trace(go.Scatter(x=np.arange(len(self.scores))[tp], y=self.ground[tp]*s_scaled[tp], mode='markers', name='True positives', line_color="green"))
-			fig.add_trace(go.Scatter(x=np.arange(len(self.scores))[fn], y=self.ground[fn]*thresh, mode='markers', name='False negatives', line_color="red"))
-			fig.add_trace(go.Scatter(x=np.arange(len(self.scores))[fp], y=s_scaled[fp], mode='markers', name='False positives', line_color="#000000", marker=dict(size=10, symbol=34, line=dict(width=2))))
+			fig.add_hline(y=threshold, line_color="#aaaaaa", name="threshold", line_dash="dash")
+			fig.add_trace(go.Scatter(x=np.arange(len(s)), y=s_scaled, mode='lines', name='Anomaly score', line_color="#515ad6"))
+			fig.add_trace(go.Scatter(x=np.arange(len(s))[tp], y=self.ground[tp]*s_scaled[tp], mode='markers', name='True positives', line_color="green"))
+			fig.add_trace(go.Scatter(x=np.arange(len(s))[fn], y=self.ground[fn]*threshold, mode='markers', name='False negatives', line_color="red"))
+			fig.add_trace(go.Scatter(x=np.arange(len(s))[fp], y=s_scaled[fp], mode='markers', name='False positives', line_color="#000000", marker=dict(size=10, symbol=34, line=dict(width=2))))
 			fig.update_layout(plot_bgcolor="white")
 			fig.update_xaxes(showgrid=False, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
 			fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
