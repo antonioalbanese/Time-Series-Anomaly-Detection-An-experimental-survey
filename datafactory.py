@@ -43,7 +43,7 @@ class MyDataset(Dataset):
                 #scale data
                 data = pd.DataFrame(scaler.fit_transform(data.values))
                 #window train data
-                limit = int(len(data)*0.6)
+                limit = int(len(data))
                 self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,limit-window_size, step)[:, None]]
                 self.n_sequences = self.sequences.shape[0]
                 self.n_features = data.values.shape[-1]
@@ -57,7 +57,7 @@ class MyDataset(Dataset):
                 data = data.astype(float)
                 data = pd.DataFrame(scaler.fit_transform(data.values))
                 ### window test data
-                limit = int(len(data)*0.6)
+                limit = int(len(data))
                 self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,limit-window_size, step)[:, None]]
                 # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]] ##[n_sequences, window_size, features]
                 self.n_sequences = self.sequences.shape[0]
