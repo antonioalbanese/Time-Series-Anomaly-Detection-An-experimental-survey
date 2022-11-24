@@ -257,22 +257,22 @@ class ADMethod():
 		scaler = MinMaxScaler()
 		s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
 		self.anomalies = np.array([True if el > threshold else False for el in s])
-		print("Point_adjust")
+		# print("Point_adjust")
 		gt = self.ground
 		pred = self.anomalies
 		anomaly_state = False
 		for i in range(len(gt)):
-			print(f"gt[i]: {gt[i]}, pred[i]: {pred[i]}, anomaly_state: {anomaly_state}")
+			# print(f"gt[i]: {gt[i]}, pred[i]: {pred[i]}, anomaly_state: {anomaly_state}")
 			if gt[i] and pred[i] and not anomaly_state:
 				anomaly_state = True
 				for j in range(i, 0, -1):
-					print(f"gt[j]: {gt[j]}")
+					# print(f"gt[j]: {gt[j]}")
 					if not gt[j]:
-						print("break")
+						# print("break")
 						break
 					else:
 						if not pred[j]:
-							print("correct pred[j]")
+							# print("correct pred[j]")
 							pred[j] = 1
 				for j in range(i, len(gt)):
 					if not gt[j]:
