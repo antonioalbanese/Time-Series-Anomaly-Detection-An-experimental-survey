@@ -285,7 +285,7 @@ class ADMethod():
 			if anomaly_state:
 				pred[i] = 1
 
-				
+
 		self.anomalies = pred
 
 		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
@@ -293,9 +293,9 @@ class ADMethod():
 			print(classification_report(self.ground, self.anomalies, output_dict=False))
 		if plot:
 			s_scaled = s.reshape(-1)
-			tp = np.logical_and(np.array(s_scaled) >= threshold,  self.ground == True)
-			fn = np.logical_and(np.array(s_scaled) < threshold,  self.ground == True)
-			fp = np.logical_and(np.array(s_scaled) >= threshold,  self.ground == False)
+			tp = np.logical_and(self.anomalies,  self.ground == True)
+			fn = np.logical_and(self.anomalies,  self.ground == True)
+			fp = np.logical_and(self.anomalies,  self.ground == False)
 
 
 			fig = go.Figure()
