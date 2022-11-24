@@ -147,7 +147,7 @@ class ADMethod():
 		
 		return train_history
 
-	def test(self, alphaUSAD: float, betaUSAD: float):
+	def test(self, alphaUSAD=None, betaUSAD=None):
 		if[self.config['VERBOSE']]:
 			print("=====================================================================")
 			print("Testing...")
@@ -349,9 +349,9 @@ def testUsad(model: UsadModel, loader: DataLoader, device, alpha = 0.5, beta=0.5
 			batch= batch.to(device)
 			w1=model.decoder1(model.encoder(batch)).to('cpu')
 			w2=model.decoder2(model.encoder(w1.to(device))).to('cpu')
-			r.append((alpha*torch.mean((batch.to('cpu')-w1)**2,axis=0)+beta*torch.mean((batch.to('cpu')-w2)**2,axis=0)).to('cpu'))
-		
-		scores = np.concatenate([torch.stack(r[:-1]).flatten().detach().cpu().numpy(),
+			# r.append((alpha*torch.mean((batch.to('cpu')-w1)**2,axis=0)+beta*torch.mean((batch.to('cpu')-w2)**2,axis=0)).to('cpu'))
+			r.append((batch.to('cpu') - w1) + (batch.to('cpu')-w2))
+		# scores = np.concatenate([torch.stack(r[:-1]).flatten().detach().cpu().numpy(),
 							r[-1].flatten().detach().cpu().numpy()])
 		
-	return scores
+	return r
