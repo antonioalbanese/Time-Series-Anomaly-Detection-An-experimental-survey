@@ -262,24 +262,30 @@ class ADMethod():
 		pred = self.anomalies
 		anomaly_state = False
 		for i in range(len(gt)):
-			if gt[i] == 1 and pred[i] == 1 and not anomaly_state:
+			print(f"gt[i]: {gt[i]}, pred[i]: {pred[i]}, anomaly_state: {anomaly_state}")
+			if gt[i] and pred[i] and not anomaly_state:
 				anomaly_state = True
 				for j in range(i, 0, -1):
-					if gt[j] == 0:
+					print(f"gt[j]: {gt[j]}")
+					if not gt[j]:
+						print("break")
 						break
 					else:
-						if pred[j] == 0:
+						if not pred[j]:
+							print("correct pred[j]")
 							pred[j] = 1
 				for j in range(i, len(gt)):
-					if gt[j] == 0:
+					if not gt[j]:
 						break
 					else:
-						if pred[j] == 0:
+						if not pred[j]:
 							pred[j] = 1
-			elif gt[i] == 0:
+			elif not gt[i]:
 				anomaly_state = False
 			if anomaly_state:
 				pred[i] = 1
+
+				
 		self.anomalies = pred
 
 		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
