@@ -352,6 +352,6 @@ def testUsad(model: UsadModel, loader: DataLoader, device, alpha = 0.5, beta=0.5
 			# r.append((alpha*torch.mean((batch.to('cpu')-w1)**2,axis=0)+beta*torch.mean((batch.to('cpu')-w2)**2,axis=0)).to('cpu'))
 			r.append((batch.to('cpu') - w1) + (batch.to('cpu')-w2))
 		# scores = np.concatenate([torch.stack(r[:-1]).flatten().detach().cpu().numpy(),
-							r[-1].flatten().detach().cpu().numpy()])
+							# r[-1].flatten().detach().cpu().numpy()])
 		
 	return r
