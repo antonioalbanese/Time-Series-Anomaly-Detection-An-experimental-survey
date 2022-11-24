@@ -257,6 +257,31 @@ class ADMethod():
 		scaler = MinMaxScaler()
 		s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
 		self.anomalies = np.array([True if el > threshold else False for el in s])
+
+		gt = self.ground
+		pred = self.anomalies
+		anomaly_state = False
+		for i in range(len(gt)):
+			if gt[i] == 1 and pred[i] == 1 and not anomaly_state:
+				anomaly_state = True
+				for j in range(i, 0, -1):
+					if gt[j] == 0:
+						break
+					else:
+						if pred[j] == 0:
+							pred[j] = 1
+				for j in range(i, len(gt)):
+					if gt[j] == 0:
+						break
+					else:
+						if pred[j] == 0:
+							pred[j] = 1
+			elif gt[i] == 0:
+				anomaly_state = False
+			if anomaly_state:
+				pred[i] = 1
+		self.anomalies = pred
+
 		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
 		if self.config['VERBOSE']:
 			print(classification_report(self.ground, self.anomalies, output_dict=False))
