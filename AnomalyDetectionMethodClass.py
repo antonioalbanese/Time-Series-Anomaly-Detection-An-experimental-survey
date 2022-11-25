@@ -74,7 +74,8 @@ class ADMethod():
 		if self.config['LOGGER']:
 			wandb.init(project="experimental-survey-AD",
 						entity="michiamoantonio",
-						name="{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']) )
+						name= "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
+						group="{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']) )
 
 		start_time = time.time()
 		self.train_ds = MyDataset(dataset=self.config['DATASET'], 
@@ -202,7 +203,8 @@ class ADMethod():
 		if self.config['LOGGER']:
 			wandb.init(project="experimental-survey-AD",
 						entity="michiamoantonio",
-						name="{}_{}-seqlen_{}-step_{}-lr_{}".format(self.name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
+						group="{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']), 
+						name="RESULTS-th_{}".format(threshold),
 						resume = True)
 			table = wandb.Table(columns = ["scores-th_{}".format(threshold)])
 			path_to_plotly_html = "./scores-th_{}.html".format(threshold)
@@ -341,7 +343,8 @@ class ADMethod():
 		if self.config['LOGGER']: 
 			fig.write_html(path_to_plotly_html, auto_play = False)
 			table.add_data(wandb.Html(path_to_plotly_html))
-			wandb.log({"test_table": table})
+			wandb.log({"figure": table})
+			wandb.log(self.report)
 			wandb.finish()
 
 		return self.report
