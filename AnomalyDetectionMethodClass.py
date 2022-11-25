@@ -203,7 +203,7 @@ class ADMethod():
 		if self.config['LOGGER']:
 			wandb.init(project="experimental-survey-AD",
 						entity="michiamoantonio",
-						group="{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']), 
+						group="{}_{}-seqlen_{}-step_{}-lr_{}".format(self.name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']), 
 						name="RESULTS-th_{}".format(threshold),
 						resume = True)
 			table = wandb.Table(columns = ["scores-th_{}".format(threshold)])
