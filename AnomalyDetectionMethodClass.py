@@ -74,7 +74,7 @@ class ADMethod():
 		if self.config['LOGGER']:
 			wandb.init(project="experimental-survey-AD",
 						entity="michiamoantonio",
-						name="{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']) )
+						name="{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']) )
 
 		start_time = time.time()
 		self.train_ds = MyDataset(dataset=self.config['DATASET'], 
