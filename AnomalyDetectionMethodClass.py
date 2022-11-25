@@ -301,7 +301,7 @@ class ADMethod():
 			fig = go.Figure()
 			fig.add_hline(y=threshold, line_color="#aaaaaa", name="threshold", line_dash="dash")
 			fig.add_trace(go.Scatter(x=np.arange(len(s)), y=s_scaled, mode='lines', name='Anomaly score', line_color="#515ad6"))
-			fig.add_trace(go.Scatter(x=np.arange(len(s))[tp], y=self.ground[tp]*s_scaled[tp], mode='markers', name='True positives', line_color="green"))
+			fig.add_trace(go.Scatter(x=np.arange(len(s))[tp], y=self.ground[tp]*threshold, mode='markers', name='True positives', line_color="green"))
 			fig.add_trace(go.Scatter(x=np.arange(len(s))[fn], y=self.ground[fn]*threshold, mode='markers', name='False negatives', line_color="red"))
 			fig.add_trace(go.Scatter(x=np.arange(len(s))[fp], y=s_scaled[fp], mode='markers', name='False positives', line_color="#000000", marker=dict(size=10, symbol=34, line=dict(width=2))))
 			fig.update_layout(plot_bgcolor="white")
