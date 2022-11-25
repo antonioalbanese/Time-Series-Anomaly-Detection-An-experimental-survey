@@ -21,6 +21,8 @@ import plotly.graph_objects as go
 import time
 from torchinfo import summary
 
+import wandb
+
 
 class ADMethod_back():
 	def __init__(self, method_name:str, settings: dict, data_path: str):
@@ -69,6 +71,11 @@ class ADMethod():
 		if self.config['VERBOSE']:
 			print("=====================================================================")
 			print("Initializing...")
+		if self.config['LOGGER']:
+			wandb.init(project="experimental-survey-AD",
+						entity="michiamoantonio",
+						name="{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']) )
+
 		start_time = time.time()
 		self.train_ds = MyDataset(dataset=self.config['DATASET'], 
 								  data_path=self.config['DATAPATH'], 
@@ -120,6 +127,11 @@ class ADMethod():
 
 			for epoch in range(self.config['EPOCHS']):
 				epoch_loss = deepAntEpoch(self.model, self.train_dl, self.criterion, self.optimizer, self.device)
+				if self.config['LOGGER']:
+					wandb.log({
+						"epoch": epoch,
+						"loss": epoch_loss 
+					})
 				if self.config['VERBOSE']:
 					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
 				train_losses.append([epoch_loss])
@@ -132,6 +144,13 @@ class ADMethod():
 
 			for epoch in range(self.config['EPOCHS']):
 				epoch_loss1, epoch_loss2 = UsadEpoch(self.model, self.train_dl, self.optimizer1, self.optimizer2, epoch, self.device)
+				if self.config['LOGGER']:
+					wandb.log({
+						"epoch": epoch,
+						"loss1": epoch_loss1,
+						"loss2": epoch_loss2,
+						"loss_sum": epoch_loss1+epoch_loss2
+					})
 				if self.config['VERBOSE']:
 					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss_1:{epoch_loss1}. train_loss_2:{epoch_loss2}")
 				train_losses1.append([epoch_loss1])
