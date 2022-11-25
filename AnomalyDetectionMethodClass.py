@@ -163,7 +163,8 @@ class ADMethod():
 		if self.config['VERBOSE']:
 			print(f"Training finished in {total_elapsed} sec., avg time per epoch: {total_elapsed/self.config['EPOCHS']} sec.")
 			print("=====================================================================")
-		
+		if self.config['LOGGER']:
+			wandb.finish()
 		return train_history
 
 	def test(self, alphaUSAD=None, betaUSAD=None):
