@@ -199,6 +199,13 @@ class ADMethod():
 		if self.config['VERBOSE']:
 			print("=====================================================================")
 			print("Computing results... ") 
+		if self.config['LOGGER']:
+			wandb.init(project="experimental-survey-AD",
+						entity="michiamoantonio",
+						name="{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
+						resume = True)
+			table = wandb.Table(columns = ["scores-th_{}".format(threshold)])
+			path_to_plotly_html = "./scores-th_{}.html".format(threshold)
 		if self.name == "DEEPANT":
 			window_size = self.config['SEQ_LEN']
 			step = self.config['STEP']
@@ -311,23 +318,31 @@ class ADMethod():
 		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
 		if self.config['VERBOSE']:
 			print(classification_report(self.ground, self.anomalies, output_dict=False))
-		if plot:
-			s_scaled = s.reshape(-1)
-			tp = np.logical_and(self.anomalies == True,  self.ground == True)
-			fn = np.logical_and(self.anomalies == False,  self.ground == True)
-			fp = np.logical_and(self.anomalies == True,  self.ground == False)
+		
+		s_scaled = s.reshape(-1)
+		tp = np.logical_and(self.anomalies == True,  self.ground == True)
+		fn = np.logical_and(self.anomalies == False,  self.ground == True)
+		fp = np.logical_and(self.anomalies == True,  self.ground == False)
 
 
-			fig = go.Figure()
-			fig.add_hline(y=threshold, line_color="#aaaaaa", name="threshold", line_dash="dash")
-			fig.add_trace(go.Scatter(x=np.arange(len(s)), y=s_scaled, mode='lines', name='Anomaly score', line_color="#515ad6"))
-			fig.add_trace(go.Scatter(x=np.arange(len(s))[tp], y=self.ground[tp]*threshold, mode='markers', name='True positives', line_color="green"))
-			fig.add_trace(go.Scatter(x=np.arange(len(s))[fn], y=self.ground[fn]*threshold, mode='markers', name='False negatives', line_color="red"))
-			fig.add_trace(go.Scatter(x=np.arange(len(s))[fp], y=s_scaled[fp], mode='markers', name='False positives', line_color="#000000", marker=dict(size=10, symbol=34, line=dict(width=2))))
-			fig.update_layout(plot_bgcolor="white")
-			fig.update_xaxes(showgrid=False, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
-			fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
+		fig = go.Figure()
+		fig.add_hline(y=threshold, line_color="#aaaaaa", name="threshold", line_dash="dash")
+		fig.add_trace(go.Scatter(x=np.arange(len(s)), y=s_scaled, mode='lines', name='Anomaly score', line_color="#515ad6"))
+		fig.add_trace(go.Scatter(x=np.arange(len(s))[tp], y=self.ground[tp]*threshold, mode='markers', name='True positives', line_color="green"))
+		fig.add_trace(go.Scatter(x=np.arange(len(s))[fn], y=self.ground[fn]*threshold, mode='markers', name='False negatives', line_color="red"))
+		fig.add_trace(go.Scatter(x=np.arange(len(s))[fp], y=s_scaled[fp], mode='markers', name='False positives', line_color="#000000", marker=dict(size=10, symbol=34, line=dict(width=2))))
+		fig.update_layout(plot_bgcolor="white")
+		fig.update_xaxes(showgrid=False, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
+		fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
+		
+		if plot:	
 			fig.show()
+
+		if self.config['LOGGER']: 
+			fig.write_html(path_to_plotly_html, auto_play = False)
+			table.add_data(wandb.Html(path_to_plotly_html))
+			wandb.log({"test_table": table})
+			wandb.finish()
 
 		return self.report
 
