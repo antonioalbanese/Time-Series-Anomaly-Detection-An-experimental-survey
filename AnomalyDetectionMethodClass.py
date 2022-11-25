@@ -345,7 +345,7 @@ class ADMethod():
 			table.add_data(wandb.Html(path_to_plotly_html))
 			wandb.log({"figure": table})
 			wandb.log(self.report)
-			wandb.finish()
+			# wandb.finish()
 
 		return self.report
 
