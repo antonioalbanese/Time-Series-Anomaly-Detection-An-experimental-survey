@@ -343,7 +343,7 @@ class ADMethod():
 		if self.config['LOGGER']: 
 			fig.write_html(path_to_plotly_html, auto_play = False)
 			table.add_data(wandb.Html(path_to_plotly_html))
-			wandb.log({"figure": table})
+			wandb.log({"figure_{}".format(threshold): table})
 			wandb.log(self.report)
 			# wandb.finish()
 
