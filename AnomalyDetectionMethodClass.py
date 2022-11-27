@@ -69,6 +69,18 @@ class ADMethod():
 		self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 		self.name = name
 		self.config = config
+		self.best_accuracy = {
+			"accuracy": 0,
+			"threshold": None 
+		}
+		self.best_TrueF1 = {
+			"f1-score": 0,
+			"threshold": None 
+		}
+		self.best_AvgF1 = {
+			"f1-score": 0,
+			"threshold": None 
+		}
 		self.reports = []
 		if self.config['VERBOSE']:
 			print("=====================================================================")
@@ -78,6 +90,9 @@ class ADMethod():
 						entity="michiamoantonio",
 						name= "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
 						group="{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']) )
+			api = wandb.Api()
+			self.wandb_run = api.run("michiamoantonio/experimental-survey-AD/" + "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']))
+			
 
 		start_time = time.time()
 		self.train_ds = MyDataset(dataset=self.config['DATASET'], 
@@ -131,9 +146,11 @@ class ADMethod():
 			for epoch in range(self.config['EPOCHS']):
 				epoch_loss = deepAntEpoch(self.model, self.train_dl, self.criterion, self.optimizer, self.device)
 				if self.config['LOGGER']:
+					wandb.define_metric("epoch")
+					wandb.define_metric("loss", step_metric="epoch")
 					wandb.log({
 						"epoch": epoch,
-						"loss": epoch_loss 
+						"loss": epoch_loss
 					})
 				if self.config['VERBOSE']:
 					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
@@ -148,6 +165,10 @@ class ADMethod():
 			for epoch in range(self.config['EPOCHS']):
 				epoch_loss1, epoch_loss2 = UsadEpoch(self.model, self.train_dl, self.optimizer1, self.optimizer2, epoch, self.device)
 				if self.config['LOGGER']:
+					wandb.define_metric("epoch")
+					wandb.define_metric("loss1", step_metric="epoch")
+					wandb.define_metric("loss2", step_metric="epoch")
+					wandb.define_metric("loss_sum", step_metric="epoch")
 					wandb.log({
 						"epoch": epoch,
 						"loss1": epoch_loss1,
@@ -290,15 +311,13 @@ class ADMethod():
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])
 
 
-
-		# thresh = np.percentile(combined_energy, 100 - self.config['CENTILE'])
-		# self.anomalies = np.array([True if el > threshold else False for el in s])
-		# self.report = classification_report(self.ground, self.anomalies, output_dict=True)
-
+		#scalind and computing anomalies
 		scaler = MinMaxScaler()
 		s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
 		self.anomalies = np.array([True if el > threshold else False for el in s])
-		# print("Point_adjust")
+
+
+		### Point_adjust
 		gt = self.ground
 		pred = self.anomalies
 		anomaly_state = False
@@ -325,19 +344,31 @@ class ADMethod():
 				anomaly_state = False
 			if anomaly_state:
 				pred[i] = 1
-
-
 		self.anomalies = pred
 
+		### obtaining report
 		report = classification_report(self.ground, self.anomalies, output_dict=True)
+
+		### updating best metrics
+		if self.best_accuracy['accuracy'] < report["accuracy"]:
+			self.best_accuracy['accuracy'] = report['accuracy'].copy()
+			self.best_accuracy['threshold'] = threshold
+		if self.best_AvgF1['f1-score'] < report["macro avg"]["f1-score"]:
+			self.best_AvgF1['f1-score'] = report["macro avg"]['f1-score'].copy()
+			self.best_AvgF1['threshold'] = threshold
+		if self.best_TrueF1['f1-score'] < report["True"]['f1-score']:
+			self.best_TrueF1['f1-score'] = report["True"]['f1-score'].copy()
+			self.best_TrueF1['threshold'] = threshold
+
+		### printing report
 		if self.config['VERBOSE']:
 			print(classification_report(self.ground, self.anomalies, output_dict=False))
 		
+		### preparing graph
 		s_scaled = s.reshape(-1)
 		tp = np.logical_and(self.anomalies == True,  self.ground == True)
 		fn = np.logical_and(self.anomalies == False,  self.ground == True)
 		fp = np.logical_and(self.anomalies == True,  self.ground == False)
-
 
 		fig = go.Figure()
 		fig.add_hline(y=threshold, line_color="#aaaaaa", name="threshold", line_dash="dash")
@@ -349,9 +380,11 @@ class ADMethod():
 		fig.update_xaxes(showgrid=False, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
 		fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGrey', showline=True, linewidth=2, linecolor='DarkGrey')
 		
+		### plotting figure
 		if plot:	
 			fig.show()
 
+		### logging figure
 		if self.config['LOGGER']:
 			rep_to_log = {
 				"threshold":threshold,
@@ -367,7 +400,12 @@ class ADMethod():
 			table.add_data(wandb.Html(path_to_plotly_html))
 			wandb.log({"figure_{}".format(threshold): table})
 			wandb.log(rep_to_log)
-			# wandb.finish()
+			self.wandb_run.summary["best_accuracy"] = self.best_accuracy
+			self.wandb_run.summary["best_AvgF1"] = self.best_AvgF1
+			self.wandb_run.summary["best_TrueF1"] = self.best_TrueF1
+
+
+		
 
 		self.reports.append([report])
 		return report
