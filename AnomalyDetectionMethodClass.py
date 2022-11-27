@@ -92,8 +92,8 @@ class ADMethod():
 						name= "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
 						group="{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']) 
 						)
-			api = wandb.Api()
-			self.wandb_run = api.run("michiamoantonio/experimental-survey-AD/" + "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']))
+			# api = wandb.Api()
+			# self.wandb_run = api.run("michiamoantonio/experimental-survey-AD/" + "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']))
 			
 
 		start_time = time.time()
@@ -418,9 +418,9 @@ class ADMethod():
 			print(f"Best True f1-score is {self.best_TrueF1['f1-score']} with threshold {self.best_TrueF1['threshold']}")
 		
 		if self.config['LOGGER']:
-			self.wandb_run.summary["best_accuracy"] = self.best_accuracy
-			self.wandb_run.summary["best_AvgF1"] = self.best_AvgF1
-			self.wandb_run.summary["best_TrueF1"] = self.best_TrueF1
+			wandb.run.summary["best_accuracy"] = self.best_accuracy
+			wandb.run.summary["best_AvgF1"] = self.best_AvgF1
+			wandb.run.summary["best_TrueF1"] = self.best_TrueF1
 			wandb.finish()
 
 def deepAntEpoch(model: DeepAnt, loader: DataLoader, criterion, optimizer, device):
