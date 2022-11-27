@@ -353,13 +353,13 @@ class ADMethod():
 
 		### updating best metrics
 		if self.best_accuracy['accuracy'] < report["accuracy"]:
-			self.best_accuracy['accuracy'] = report['accuracy'].copy()
+			self.best_accuracy['accuracy'] = report['accuracy']
 			self.best_accuracy['threshold'] = threshold
 		if self.best_AvgF1['f1-score'] < report["macro avg"]["f1-score"]:
-			self.best_AvgF1['f1-score'] = report["macro avg"]['f1-score'].copy()
+			self.best_AvgF1['f1-score'] = report["macro avg"]['f1-score']
 			self.best_AvgF1['threshold'] = threshold
 		if self.best_TrueF1['f1-score'] < report["True"]['f1-score']:
-			self.best_TrueF1['f1-score'] = report["True"]['f1-score'].copy()
+			self.best_TrueF1['f1-score'] = report["True"]['f1-score']
 			self.best_TrueF1['threshold'] = threshold
 
 		### printing report
