@@ -29,6 +29,7 @@ class ADMethod_back():
 		self.method_name = method_name
 		self.settings = settings
 		self.data_path = data_path
+		
 
 	def prepare_pipeline(self):
 		if self.method_name == 'transformer':
@@ -68,6 +69,7 @@ class ADMethod():
 		self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 		self.name = name
 		self.config = config
+		self.reports = []
 		if self.config['VERBOSE']:
 			print("=====================================================================")
 			print("Initializing...")
@@ -206,8 +208,18 @@ class ADMethod():
 			# 			group="{}_{}-seqlen_{}-step_{}-lr_{}".format(self.name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']), 
 			# 			name="RESULTS-th_{}".format(threshold),
 			# 			resume = True)
+			wandb.define_metric("threshold")
+			wandb.define_metric("accuracy", step_metric="threshold")
+			wandb.define_metric("Recall_True", step_metric="threshold")
+			wandb.define_metric("Precision_True", step_metric="threshold")
+			wandb.define_metric("F1_True", step_metric="threshold")
+			wandb.define_metric("Precision_Avg", step_metric="threshold")
+			wandb.define_metric("Recall_Avg", step_metric="threshold")
+			wandb.define_metric("F1_Avg", step_metric="threshold")
 			table = wandb.Table(columns = ["scores-th_{}".format(threshold)])
 			path_to_plotly_html = "./scores-th_{}.html".format(threshold)
+
+
 		if self.name == "DEEPANT":
 			window_size = self.config['SEQ_LEN']
 			step = self.config['STEP']
@@ -317,7 +329,7 @@ class ADMethod():
 
 		self.anomalies = pred
 
-		self.report = classification_report(self.ground, self.anomalies, output_dict=True)
+		report = classification_report(self.ground, self.anomalies, output_dict=True)
 		if self.config['VERBOSE']:
 			print(classification_report(self.ground, self.anomalies, output_dict=False))
 		
@@ -340,14 +352,25 @@ class ADMethod():
 		if plot:	
 			fig.show()
 
-		if self.config['LOGGER']: 
+		if self.config['LOGGER']:
+			rep_to_log = {
+				"threshold":threshold,
+				"accuracy":report['accuracy'],
+				"Recall_True":report['True']['recall'],
+				"Precision_True":report['True']['precision'],
+				"F1_True":report['True']['f1-score'],
+				"Precision_Avg":report['macro avg']['precision'],
+				"Recall_Avg":report['macro avg']['recall'],
+				"F1_Avg":report['macro avg']['f1-score']
+			} 
 			fig.write_html(path_to_plotly_html, auto_play = False)
 			table.add_data(wandb.Html(path_to_plotly_html))
 			wandb.log({"figure_{}".format(threshold): table})
-			wandb.log(self.report)
+			wandb.log(rep_to_log)
 			# wandb.finish()
 
-		return self.report
+		self.reports.append([report])
+		return report
 
 
 
