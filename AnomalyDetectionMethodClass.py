@@ -400,9 +400,7 @@ class ADMethod():
 			table.add_data(wandb.Html(path_to_plotly_html))
 			wandb.log({"figure_{}".format(threshold): table})
 			wandb.log(rep_to_log)
-			self.wandb_run.summary["best_accuracy"] = self.best_accuracy
-			self.wandb_run.summary["best_AvgF1"] = self.best_AvgF1
-			self.wandb_run.summary["best_TrueF1"] = self.best_TrueF1
+			
 
 
 		
@@ -410,8 +408,18 @@ class ADMethod():
 		self.reports.append([report])
 		return report
 
-
-
+	def close_run(self):
+		if self.config['VERBOSE']:
+			print("Run closed.")
+			print(f"Best accuracy is {self.best_accuracy['accuracy']} with threshold {self.best_accuracy['threshold']}")
+			print(f"Best Avg f1-score is {self.best_AvgF1['f1-score']} with threshold {self.best_AvgF1['threshold']}")
+			print(f"Best True f1-score is {self.best_TrueF1['f1-score']} with threshold {self.best_TrueF1['threshold']}")
+		
+		if self.config['LOGGER']:
+			self.wandb_run.summary["best_accuracy"] = self.best_accuracy
+			self.wandb_run.summary["best_AvgF1"] = self.best_AvgF1
+			self.wandb_run.summary["best_TrueF1"] = self.best_TrueF1
+			wandb.finish()
 
 def deepAntEpoch(model: DeepAnt, loader: DataLoader, criterion, optimizer, device):
 	curr_loss = 0
