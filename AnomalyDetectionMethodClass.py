@@ -132,6 +132,8 @@ class ADMethod():
 			print(f"Data preprocessing and method configuration finished in {elapsed} sec.")
 			print("Model summary: ")
 			print(summary(self.model))
+		if self.config['LOGGER']:
+			wandb.run.summary['init_time'] = elapsed
 			
 	def train(self):
 		train_history={}
@@ -191,7 +193,7 @@ class ADMethod():
 			print("=====================================================================")
 		if self.config['LOGGER']:
 			wandb.run.summary['training_time'] = total_elapsed
-			wandb.run.summary.update()
+			# wandb.run.summary.update()
 		return train_history
 
 	def test(self, alphaUSAD=None, betaUSAD=None):
@@ -221,7 +223,7 @@ class ADMethod():
 			print("=====================================================================")
 		if self.config['LOGGER']:
 			wandb.run.summary['test_time'] = total_elapsed
-			wandb.run.summary.update()
+			# wandb.run.summary.update()
 		
 		return self.predictions, self.scores
 
@@ -426,7 +428,7 @@ class ADMethod():
 			wandb.run.summary["best_accuracy"] = self.best_accuracy
 			wandb.run.summary["best_AvgF1"] = self.best_AvgF1
 			wandb.run.summary["best_TrueF1"] = self.best_TrueF1
-			wandb.run.summary.update()
+			# wandb.run.summary.update()
 			wandb.finish()
 
 def deepAntEpoch(model: DeepAnt, loader: DataLoader, criterion, optimizer, device):
