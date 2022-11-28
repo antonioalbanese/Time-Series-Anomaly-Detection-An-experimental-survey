@@ -88,8 +88,8 @@ class ADMethod():
 		if self.config['LOGGER']:
 			wandb.init(project="experimental-survey-AD",
 						entity="michiamoantonio",
-						id="TRAINING___{}_{}-seqlen_{}-step_{}-lr_{:.5f}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
-						name= "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{:.5f}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
+						id="TRAINING___{}_{}-seqlen_{}-step_{}-epochs_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['EPOCHS']),
+						name= "TRAINING___{}_{}-seqlen_{}-step_{}-epochs_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['EPOCHS']),
 						group="{}".format(name) 
 						)
 			# api = wandb.Api()
