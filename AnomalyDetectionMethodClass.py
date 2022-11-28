@@ -88,9 +88,9 @@ class ADMethod():
 		if self.config['LOGGER']:
 			wandb.init(project="experimental-survey-AD",
 						entity="michiamoantonio",
-						id="TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
-						name= "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
-						group="{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']) 
+						id="TRAINING___{}_{}-seqlen_{}-step_{}-lr_{:.5f}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
+						name= "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{:.5f}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
+						group="{}_{}-seqlen_{}-step_{}-lr_{:.5f}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']) 
 						)
 			# api = wandb.Api()
 			# self.wandb_run = api.run("michiamoantonio/experimental-survey-AD/" + "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']))
@@ -155,7 +155,7 @@ class ADMethod():
 						"loss": epoch_loss
 					})
 				if self.config['VERBOSE']:
-					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss}")
+					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss:{epoch_loss:.5f}")
 				train_losses.append([epoch_loss])
 			train_history['TRAIN_LOSSES'] = np.array(train_losses)
 		if self.name == "USAD":
@@ -178,7 +178,7 @@ class ADMethod():
 						"loss_sum": epoch_loss1+epoch_loss2
 					})
 				if self.config['VERBOSE']:
-					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss_1:{epoch_loss1}. train_loss_2:{epoch_loss2}")
+					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss_1:{epoch_loss1:.5f}. train_loss_2:{epoch_loss2:.5f}")
 				train_losses1.append([epoch_loss1])
 				train_losses2.append([epoch_loss2])
 			train_history['TRAIN_LOSSES_1'] = np.array(train_losses1)
@@ -187,10 +187,11 @@ class ADMethod():
 		end_time = time.time()
 		total_elapsed = end_time - start_time
 		if self.config['VERBOSE']:
-			print(f"Training finished in {total_elapsed} sec., avg time per epoch: {total_elapsed/self.config['EPOCHS']} sec.")
+			print(f"Training finished in {total_elapsed:.3f} sec., avg time per epoch: {total_elapsed/self.config['EPOCHS']:.3f} sec.")
 			print("=====================================================================")
-		# if self.config['LOGGER']:
-		# 	wandb.finish()
+		if self.config['LOGGER']:
+			wandb.run.summary['training_time'] = total_elapsed
+			wandb.run.summary.update()
 		return train_history
 
 	def test(self, alphaUSAD=None, betaUSAD=None):
@@ -216,8 +217,12 @@ class ADMethod():
 		end_time = time.time()
 		total_elapsed = end_time - start_time
 		if[self.config['VERBOSE']]:
-			print(f"Test finished in {total_elapsed} sec.")
+			print(f"Test finished in {total_elapsed:.3f} sec.")
 			print("=====================================================================")
+		if self.config['LOGGER']:
+			wandb.run.summary['test_time'] = total_elapsed
+			wandb.run.summary.update()
+		
 		return self.predictions, self.scores
 
 
@@ -239,8 +244,8 @@ class ADMethod():
 			wandb.define_metric("Precision_Avg", step_metric="threshold")
 			wandb.define_metric("Recall_Avg", step_metric="threshold")
 			wandb.define_metric("F1_Avg", step_metric="threshold")
-			table = wandb.Table(columns = ["scores-th_{}".format(threshold)])
-			path_to_plotly_html = "./scores-th_{}.html".format(threshold)
+			table = wandb.Table(columns = ["scores-th_{:.2f}".format(threshold)])
+			path_to_plotly_html = "./scores-th_{:.2f}.html".format(threshold)
 
 
 		if self.name == "DEEPANT":
@@ -400,7 +405,7 @@ class ADMethod():
 			} 
 			fig.write_html(path_to_plotly_html, auto_play = False)
 			table.add_data(wandb.Html(path_to_plotly_html))
-			wandb.log({"figure_{}".format(threshold): table})
+			wandb.log({"figure_{:.2f}".format(threshold): table})
 			wandb.log(rep_to_log)
 			
 
@@ -413,14 +418,15 @@ class ADMethod():
 	def close_run(self):
 		if self.config['VERBOSE']:
 			print("Run closed.")
-			print(f"Best accuracy is {self.best_accuracy['accuracy']} with threshold {self.best_accuracy['threshold']}")
-			print(f"Best Avg f1-score is {self.best_AvgF1['f1-score']} with threshold {self.best_AvgF1['threshold']}")
-			print(f"Best True f1-score is {self.best_TrueF1['f1-score']} with threshold {self.best_TrueF1['threshold']}")
+			print(f"Best accuracy is {self.best_accuracy['accuracy']:.2f} with threshold {self.best_accuracy['threshold']:.2f}")
+			print(f"Best Avg f1-score is {self.best_AvgF1['f1-score']:.2f} with threshold {self.best_AvgF1['threshold']:.2f}")
+			print(f"Best True f1-score is {self.best_TrueF1['f1-score']:.2f} with threshold {self.best_TrueF1['threshold']:.2f}")
 		
 		if self.config['LOGGER']:
 			wandb.run.summary["best_accuracy"] = self.best_accuracy
 			wandb.run.summary["best_AvgF1"] = self.best_AvgF1
 			wandb.run.summary["best_TrueF1"] = self.best_TrueF1
+			wandb.run.summary.update()
 			wandb.finish()
 
 def deepAntEpoch(model: DeepAnt, loader: DataLoader, criterion, optimizer, device):
