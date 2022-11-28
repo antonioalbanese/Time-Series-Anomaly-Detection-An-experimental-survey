@@ -90,7 +90,7 @@ class ADMethod():
 						entity="michiamoantonio",
 						id="TRAINING___{}_{}-seqlen_{}-step_{}-lr_{:.5f}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
 						name= "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{:.5f}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']),
-						group="{}_{}-seqlen_{}-step_{}-lr_{:.5f}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']) 
+						group="{}".format(name) 
 						)
 			# api = wandb.Api()
 			# self.wandb_run = api.run("michiamoantonio/experimental-survey-AD/" + "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']))
