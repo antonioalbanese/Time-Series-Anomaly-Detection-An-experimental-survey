@@ -57,11 +57,14 @@ class MyDataset(Dataset):
                 data = data.astype(float)
                 data = pd.DataFrame(scaler.fit_transform(data.values))
                 ### window test data
-                limit = int(len(data))
-                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,limit-window_size, step)[:, None]]
-                # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]] ##[n_sequences, window_size, features]
-                self.n_sequences = self.sequences.shape[0]
-                self.n_features = data.values.shape[-1]
+                # limit = int(len(data))
+                # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,limit-window_size, step)[:, None]]
+                # # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]] ##[n_sequences, window_size, features]
+                # self.n_sequences = self.sequences.shape[0]
+                # self.n_features = data.values.shape[-1]
+                self.data = data.values
+                self.n_sequences = self.data.shape//self.step +1
+                self.n_features = self.data.shape[-1]
             ### create labels if method is DeepAnt    
             if self.method == "DEEPANT":
                 self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
@@ -142,6 +145,8 @@ class MyDataset(Dataset):
             return (torch.tensor(self.sequences[idx], dtype=torch.float),
                     torch.tensor(self.labels[idx].reshape(self.labels[idx].shape[-1]), dtype = torch.float))
         elif self.method == 'USAD':
-            return torch.tensor(self.sequences[idx], dtype = torch.float).view(([self.w_size]))
+            # return torch.tensor(self.sequences[idx], dtype = torch.float).view(([self.w_size]))
+            i = idx*self.step
+            return torch.tensor(self.data[i:self.seq_len], dtype=torch.float).reshape(self.w_size)
         else: 
             return torch.tensor(self.sequences[idx], dtype = torch.float)
