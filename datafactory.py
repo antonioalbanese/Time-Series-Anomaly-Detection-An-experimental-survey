@@ -43,10 +43,13 @@ class MyDataset(Dataset):
                 #scale data
                 data = pd.DataFrame(scaler.fit_transform(data.values))
                 #window train data
-                limit = int(len(data))
-                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,limit-window_size, step)[:, None]]
-                self.n_sequences = self.sequences.shape[0]
-                self.n_features = data.values.shape[-1]
+                # limit = int(len(data))
+                # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,limit-window_size, step)[:, None]]
+                # self.n_sequences = self.sequences.shape[0]
+                # self.n_features = data.values.shape[-1]
+                self.data = data.values
+                self.n_sequences = self.data.shape//self.step +1
+                self.n_features = self.data.shape[-1]
             elif self.mode == 'TEST':
                 ### load the test data
                 data = pd.read_csv("data/SWAT/SWaT_Dataset_Attack_v0.csv",sep=";")
