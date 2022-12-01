@@ -258,7 +258,7 @@ class ADMethod():
 				ground_truth = attack.values[:,-1]
 				ground_truth = np.array([False if el == "Normal" else True for el in ground_truth])
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
-				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])[:len(self.train_ds)]
+				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])[:len(self.test_ds)]
 			elif self.config['DATASET'] == "NAB":
 				with open("./NAB/combined_windows.json") as FI:
 					j_label = json.load(FI)
@@ -274,15 +274,15 @@ class ADMethod():
 						if df.loc[idx, 'timestamp'] >= start and df.loc[idx, 'timestamp'] <= end:
 							ground_truth[idx] = True
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
-				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])[:len(self.train_ds)]
+				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])[:len(self.test_ds)]
 			elif self.config['DATASET'] == "MSL":
 				ground_truth = np.load("./data/MSL/MSL_test_label.npy")
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
-				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])[:len(self.train_ds)]
+				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])[:len(self.test_ds)]
 			elif self.config['DATASET'] == "SMD":
 				ground_truth = np.load("./data/SMD/SMD_test_label.npy")
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
-				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])[:len(self.train_ds)]
+				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])[:len(self.test_ds)]
 
 		if self.name == "USAD":
 			window_size = self.config['SEQ_LEN']
