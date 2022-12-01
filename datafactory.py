@@ -156,7 +156,10 @@ class MyDataset(Dataset):
         return self.w_size, self.z_size
 
     def __len__(self):
-        return self.n_sequences
+        if self.method=="DEEPANT":
+            return self.n_sequences-1
+        else: 
+            return self.n_sequences
     
     def __getitem__(self, idx):
         if self.method == 'DEEPANT':
