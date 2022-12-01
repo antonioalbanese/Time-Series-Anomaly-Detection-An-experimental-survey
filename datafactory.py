@@ -164,15 +164,15 @@ class MyDataset(Dataset):
             return self.n_sequences
     
     def __getitem__(self, idx):
+        i = idx*self.step
         if self.method == 'DEEPANT':
-            i = idx*self.step
             # return (torch.tensor(self.sequences[idx], dtype=torch.float),
                     # torch.tensor(self.labels[idx].reshape(self.labels[idx].shape[-1]), dtype = torch.float))
             return (torch.tensor(self.data[i:i+self.seq_len], dtype = torch.float),
                     torch.tensor(self.data[i+self.seq_len], dtype = torch.float))
         elif self.method == 'USAD':
             # return torch.tensor(self.sequences[idx], dtype = torch.float).view(([self.w_size]))
-            i = idx*self.step
+            
             return torch.tensor(self.data[i:i+self.seq_len], dtype=torch.float).reshape(self.w_size)
         else: 
             return torch.tensor(self.data[i:i+self.seq_len], dtype = torch.float)
