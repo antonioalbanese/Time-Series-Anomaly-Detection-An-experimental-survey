@@ -48,7 +48,7 @@ class MyDataset(Dataset):
                 # self.n_sequences = self.sequences.shape[0]
                 # self.n_features = data.values.shape[-1]
                 self.n_sequences = (data.shape[0] - self.seq_len )// self.step 
-                self.data = data.values[:self.n_sequences]
+                self.data = data.values
                 self.n_features = self.data.shape[-1]
             elif self.mode == 'TEST':
                 ### load the test data
@@ -66,8 +66,7 @@ class MyDataset(Dataset):
                 # self.n_sequences = self.sequences.shape[0]
                 # self.n_features = data.values.shape[-1]
                 self.n_sequences = (data.shape[0] - self.seq_len )// self.step 
-                self.data = data.values[:self.n_sequences]
-                self.n_sequences = self.data.shape[-1] // self.step - self.seq_len
+                self.data = data.values
                 self.n_features = self.data.shape[-1]
             ### create labels if method is DeepAnt    
             if self.method == "DEEPANT":
