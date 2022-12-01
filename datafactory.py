@@ -47,7 +47,7 @@ class MyDataset(Dataset):
                 # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,limit-window_size, step)[:, None]]
                 # self.n_sequences = self.sequences.shape[0]
                 # self.n_features = data.values.shape[-1]
-                self.n_sequences = (data.shape[0] - self.seq_len )// self.step 
+                self.n_sequences = (data.shape[0] - self.seq_len )// self.step +1
                 self.data = data.values
                 self.n_features = self.data.shape[-1]
             elif self.mode == 'TEST':
@@ -65,7 +65,7 @@ class MyDataset(Dataset):
                 # # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]] ##[n_sequences, window_size, features]
                 # self.n_sequences = self.sequences.shape[0]
                 # self.n_features = data.values.shape[-1]
-                self.n_sequences = (data.shape[0] - self.seq_len )// self.step 
+                self.n_sequences = (data.shape[0] - self.seq_len )// self.step +1
                 self.data = data.values
                 self.n_features = self.data.shape[-1]
             ### create labels if method is DeepAnt    
@@ -83,7 +83,7 @@ class MyDataset(Dataset):
                 # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
                 # self.n_sequences = self.sequences.shape[0]
                 # self.n_features = data.values.shape[-1]
-                self.n_sequences = (data.shape[0] - self.seq_len )// self.step 
+                self.n_sequences = (data.shape[0] - self.seq_len )// self.step +1
                 self.data = data.values
                 self.n_features = self.data.shape[-1]
             elif self.mode == 'TEST':
@@ -93,7 +93,7 @@ class MyDataset(Dataset):
                 # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
                 # self.n_sequences = self.sequences.shape[0]
                 # self.n_features = data.values.shape[-1]
-                self.n_sequences = (data.shape[0] - self.seq_len )// self.step 
+                self.n_sequences = (data.shape[0] - self.seq_len )// self.step +1
                 self.data = data.values
                 self.n_features = self.data.shape[-1]
             ### create labels if method is DeepAnt    
@@ -141,7 +141,7 @@ class MyDataset(Dataset):
             # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
             # self.n_sequences = self.sequences.shape[0]
             # self.n_features = data.values.shape[-1]
-            self.n_sequences = (data.shape[0] - self.seq_len )// self.step 
+            self.n_sequences = (data.shape[0] - self.seq_len )// self.step +1 
             self.data = data.values
             self.n_features = self.data.shape[-1]
             # ### create labels if method is DeepAnt  
