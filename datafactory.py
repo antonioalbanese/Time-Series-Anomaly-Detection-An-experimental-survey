@@ -80,19 +80,25 @@ class MyDataset(Dataset):
                 #scale data
                 data = pd.DataFrame(scaler.fit_transform(data))
                 #window train data
-                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
-                self.n_sequences = self.sequences.shape[0]
-                self.n_features = data.values.shape[-1]
+                # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
+                # self.n_sequences = self.sequences.shape[0]
+                # self.n_features = data.values.shape[-1]
+                self.n_sequences = (data.shape[0] - self.seq_len )// self.step 
+                self.data = data.values
+                self.n_features = self.data.shape[-1]
             elif self.mode == 'TEST':
                 data = np.load("./data/MSL/MSL_test.npy")
                 data = pd.DataFrame(scaler.fit_transform(data))
                 ### window test data
-                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
-                self.n_sequences = self.sequences.shape[0]
-                self.n_features = data.values.shape[-1]
+                # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
+                # self.n_sequences = self.sequences.shape[0]
+                # self.n_features = data.values.shape[-1]
+                self.n_sequences = (data.shape[0] - self.seq_len )// self.step 
+                self.data = data.values
+                self.n_features = self.data.shape[-1]
             ### create labels if method is DeepAnt    
-            if self.method == "DEEPANT":
-                self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
+            # if self.method == "DEEPANT":
+            #     self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
         elif self.dataset == 'SMD':
             """SMD DATASET MUST BE DOWNLOADED IN data/MSL
             DATAPATH is not needed"""
@@ -102,19 +108,25 @@ class MyDataset(Dataset):
                 #scale data
                 data = pd.DataFrame(scaler.fit_transform(data))
                 #window train data
-                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
-                self.n_sequences = self.sequences.shape[0]
-                self.n_features = data.values.shape[-1]
+                # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
+                # self.n_sequences = self.sequences.shape[0]
+                # self.n_features = data.values.shape[-1]
+                self.n_sequences = (data.shape[0] - self.seq_len )// self.step 
+                self.data = data.values
+                self.n_features = self.data.shape[-1]
             elif self.mode == 'TEST':
                 data = np.load("./data/SMD/SMD_test.npy")
                 data = pd.DataFrame(scaler.fit_transform(data))
                 ### window test data
-                self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
-                self.n_sequences = self.sequences.shape[0]
-                self.n_features = data.values.shape[-1]
-            ### create labels if method is DeepAnt    
-            if self.method == "DEEPANT":
-                self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
+                # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
+                # self.n_sequences = self.sequences.shape[0]
+                # self.n_features = data.values.shape[-1]
+                self.n_sequences = (data.shape[0] - self.seq_len )// self.step 
+                self.data = data.values
+                self.n_features = self.data.shape[-1]
+            # ### create labels if method is DeepAnt    
+            # if self.method == "DEEPANT":
+            #     self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
         elif self.dataset == 'NAB':
             print("NAB DS")
             """
@@ -126,12 +138,15 @@ class MyDataset(Dataset):
             data = data.drop(["timestamp"] , axis = 1)
             data = pd.DataFrame(scaler.fit_transform(data.values))
             data = pd.DataFrame(scaler.fit_transform(data.values))
-            self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
-            self.n_sequences = self.sequences.shape[0]
-            self.n_features = data.values.shape[-1]
-            ### create labels if method is DeepAnt  
-            if self.method == "DEEPANT":
-                self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
+            # self.sequences = data.values[np.arange(window_size)[None, :] + np.arange(0,data.shape[0]-window_size, step)[:, None]]
+            # self.n_sequences = self.sequences.shape[0]
+            # self.n_features = data.values.shape[-1]
+            self.n_sequences = (data.shape[0] - self.seq_len )// self.step 
+            self.data = data.values
+            self.n_features = self.data.shape[-1]
+            # ### create labels if method is DeepAnt  
+            # if self.method == "DEEPANT":
+            #     self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
 
         if self.method == 'USAD':
             self.w_size = self.n_features*self.seq_len #shape[2]*shape[1]
