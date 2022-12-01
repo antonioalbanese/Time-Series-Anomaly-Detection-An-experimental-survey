@@ -150,6 +150,7 @@ class MyDataset(Dataset):
         elif self.method == 'USAD':
             # return torch.tensor(self.sequences[idx], dtype = torch.float).view(([self.w_size]))
             i = idx*self.step
+            print(i)
             return torch.tensor(self.data[i:i+self.seq_len], dtype=torch.float).reshape(self.w_size)
         else: 
             return torch.tensor(self.sequences[idx], dtype = torch.float)
