@@ -69,8 +69,8 @@ class MyDataset(Dataset):
                 self.data = data.values
                 self.n_features = self.data.shape[-1]
             ### create labels if method is DeepAnt    
-            if self.method == "DEEPANT":
-                self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
+            # if self.method == "DEEPANT":
+            #     self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
         elif self.dataset == 'MSL':
             """MSL DATASET MUST BE DOWNLOADED IN data/MSL
             DATAPATH is not needed"""
@@ -145,8 +145,11 @@ class MyDataset(Dataset):
     
     def __getitem__(self, idx):
         if self.method == 'DEEPANT':
-            return (torch.tensor(self.sequences[idx], dtype=torch.float),
-                    torch.tensor(self.labels[idx].reshape(self.labels[idx].shape[-1]), dtype = torch.float))
+            i = idx*self.step
+            # return (torch.tensor(self.sequences[idx], dtype=torch.float),
+                    # torch.tensor(self.labels[idx].reshape(self.labels[idx].shape[-1]), dtype = torch.float))
+            return (torch.tensor(self.data[i:i+self.seq_len], dtype = torch.float),
+                    torch.tensor(self.data[i+self.seq_len], dtype = torch.float))
         elif self.method == 'USAD':
             # return torch.tensor(self.sequences[idx], dtype = torch.float).view(([self.w_size]))
             i = idx*self.step
