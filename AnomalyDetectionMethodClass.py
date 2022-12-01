@@ -111,8 +111,8 @@ class ADMethod():
 								 method= self.name,
 								 mode='TEST',
 								 hidden_size = self.config['HIDDEN_SIZE'])
-		self.train_dl = DataLoader(self.train_ds, batch_size = 256, num_workers = 4, shuffle = False)
-		self.test_dl = DataLoader(self.test_ds, batch_size = 1, num_workers = 4, shuffle = False)
+		self.train_dl = DataLoader(self.train_ds, batch_size = 256, num_workers = 4, shuffle = False).to(self.device)
+		self.test_dl = DataLoader(self.test_ds, batch_size = 1, num_workers = 4, shuffle = False).to(self.device)
 		
 		if self.name == 'DEEPANT':
 			self.model = DeepAnt(n_features = self.train_ds.n_features, seq_len = self.config['SEQ_LEN'])
@@ -462,7 +462,7 @@ def UsadEpoch(model: UsadModel, loader: DataLoader, optimizer1, optimizer2, epoc
 	curr_loss1 = 0
 	curr_loss2 = 0
 	for idx, batch in enumerate(loader):
-		batch = batch.to(device)
+		batch = batch#.to(device)
 
 		#Train AE1
 		z = model.encoder(batch)
