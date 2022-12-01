@@ -154,6 +154,8 @@ class MyDataset(Dataset):
     
     def get_sizes(self):
         return self.w_size, self.z_size
+    def get_input_output(self):
+        return self.n_features, self.n_features
 
     def __len__(self):
         if self.method=="DEEPANT":
