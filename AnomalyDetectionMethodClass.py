@@ -135,6 +135,7 @@ class ADMethod():
                                         c_out=self.output_c, 
                                         e_layers=3).to(self.device)
 			self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config['LR'])
+			self.criterion = nn.MSELoss()
 			
 
 		end_time = time.time()
@@ -202,7 +203,7 @@ class ADMethod():
 			self.model.to(self.device)
 			self.model.train()
 			for epoch in range(self.config['EPOCHS']):
-				epoch_loss1, epoch_loss2 = TransformerEpoch(self.criterion, self.optimizer, self.train_dl, self.config['K'], self.config['SEQ_LEN'], self.device)
+				epoch_loss1, epoch_loss2 = TransformerEpoch( self.criterion, self.optimizer, self.train_dl, self.config['K'], self.config['SEQ_LEN'], self.device)
 				if self.config['LOGGER']:
 					wandb.define_metric("epoch")
 					wandb.define_metric("loss1", step_metric="epoch")
