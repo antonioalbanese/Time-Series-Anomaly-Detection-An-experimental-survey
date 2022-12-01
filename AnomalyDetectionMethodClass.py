@@ -21,6 +21,9 @@ import plotly.graph_objects as go
 import time
 from torchinfo import summary
 
+from Transformer.transformer import my_kl_loss, adjust_learning_rate, EarlyStopping
+from Transformer.model.AnomalyTransformer import AnomalyTransformer
+
 import wandb
 
 
@@ -124,6 +127,14 @@ class ADMethod():
 			self.model = UsadModel(w_size = self.w_size, z_size = self.z_size)
 			self.optimizer1 = torch.optim.Adam(list(self.model.encoder.parameters())+list(self.model.decoder1.parameters()))
 			self.optimizer2 = torch.optim.Adam(list(self.model.encoder.parameters())+list(self.model.decoder2.parameters()))
+		
+		if self.name == 'TRANSFORMER':
+			self.input_c, self.output_c = self.train_ds.get_input_output()
+			self.model = AnomalyTransformer(win_size=self.config['SEQ_LEN'], 
+                                        enc_in=self.input_c, 
+                                        c_out=self.output_c, 
+                                        e_layers=3).to(self.device)
+			self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config['LR'])
 			
 
 		end_time = time.time()
@@ -185,6 +196,32 @@ class ADMethod():
 				train_losses2.append([epoch_loss2])
 			train_history['TRAIN_LOSSES_1'] = np.array(train_losses1)
 			train_history['TRAIN_LOSSES_2'] = np.array(train_losses2)
+		if self.name == "TRANSFORMER":
+			train_losses1 = []
+			train_losses2 = []
+			self.model.to(self.device)
+			self.model.train()
+			for epoch in range(self.config['EPOCHS']):
+				epoch_loss1, epoch_loss2 = TransformerEpoch(self.optimizer, self.train_dl, self.config['K'], self.config['SEQ_LEN'], self.device)
+				if self.config['LOGGER']:
+					wandb.define_metric("epoch")
+					wandb.define_metric("loss1", step_metric="epoch")
+					wandb.define_metric("loss2", step_metric="epoch")
+					wandb.define_metric("loss_sum", step_metric="epoch")
+					wandb.log({
+						"epoch": epoch,
+						"loss1": epoch_loss1,
+						"loss2": epoch_loss2,
+						"loss_sum": epoch_loss1+epoch_loss2
+					})
+				if self.config['VERBOSE']:
+					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss_1:{epoch_loss1:.5f}. train_loss_2:{epoch_loss2:.5f}")
+				train_losses1.append([epoch_loss1])
+				train_losses2.append([epoch_loss2])
+			train_history['TRAIN_LOSSES_1'] = np.array(train_losses1)
+			train_history['TRAIN_LOSSES_2'] = np.array(train_losses2)
+			adjust_learning_rate(self.optimizer, epoch + 1, self.config['LR'])
+
 
 		end_time = time.time()
 		total_elapsed = end_time - start_time
@@ -213,6 +250,12 @@ class ADMethod():
 				self.model.eval()
 				self.model.to(self.device)
 				self.scores = testUsad(self.model, self.test_dl, self.device)
+			
+			if self.name == "TRANSFORMER":
+				self.predictions = None 
+				self.model.eval()
+				self.model.to(self.device)
+				self.scores = testTransformer(self.model, self.test_dl, self.config['SEQ_LEN'], self.device)
 
 
 
@@ -284,7 +327,7 @@ class ADMethod():
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])[:len(self.test_ds)]
 
-		if self.name == "USAD":
+		if self.name == "USAD" or self.name == "TRANSFORMER":
 			window_size = self.config['SEQ_LEN']
 			step = self.config['STEP']
 			if self.config['DATASET'] == "SWAT":
@@ -503,3 +546,79 @@ def testUsad(model: UsadModel, loader: DataLoader, device, alpha = 0.5, beta=0.5
 							r[-1].flatten().detach().cpu().numpy()])
 		
 	return r
+
+def TransformerEpoch(criterion, optimizer, train_loader, K, seq_len, device):
+	loss1_list = []
+	loss2_list = []
+	for i, input_data in enumerate(train_loader):
+		optimizer.zero_grad()
+		input = input_data.float().to(device)
+
+		output, series, prior, _ = model(input)
+
+		# calculate Association discrepancy
+		series_loss = 0.0
+		prior_loss = 0.0
+		for u in range(len(prior)):
+			a = torch.mean(my_kl_loss(series[u], (prior[u] / torch.unsqueeze(torch.sum(prior[u], dim=-1), dim=-1).repeat(1, 1, 1, seq_len)).detach()))
+			b = torch.mean(my_kl_loss((prior[u] / torch.unsqueeze(torch.sum(prior[u], dim=-1), dim=-1).repeat(1, 1, 1, seq_len)).detach(), series[u]))
+			series_loss += (a + b)
+
+			prior_a = torch.mean(my_kl_loss((prior[u] / torch.unsqueeze(torch.sum(prior[u], dim=-1), dim=-1).repeat(1, 1, 1, seq_len)), series[u].detach()))
+			prior_b = torch.mean(my_kl_loss(series[u].detach(), (prior[u] / torch.unsqueeze(torch.sum(prior[u], dim=-1), dim=-1).repeat(1, 1, 1, seq_len))))
+			prior_loss += (prior_a + prior_b)
+		series_loss = series_loss / len(prior)
+		prior_loss = prior_loss / len(prior)
+
+		rec_loss = criterion(output, input)
+
+		loss1 = rec_loss - K * series_loss
+		loss1_list.append(loss1.item())
+		loss2 = rec_loss + K * prior_loss
+		loss2_list.append(loss2.item())
+		
+
+		# Minimax strategy
+		loss1.backward(retain_graph=True)
+		loss2.backward()
+		optimizer.step()
+
+		return np.average(loss1_list), np.average(loss2_list)
+
+def testTransformer(model, thre_loader, seq_len, device):
+	temperature = 50
+	attens_energy = []
+	for i, (input_data, labels) in enumerate(thre_loader):
+		input = input_data.float().to(device)
+		output, series, prior, _ = model(input)
+
+		loss = torch.mean(criterion(input, output), dim=-1)
+
+		series_loss = 0.0
+		prior_loss = 0.0
+		for u in range(len(prior)):
+			if u == 0:
+				series_loss = my_kl_loss(series[u], (
+						prior[u] / torch.unsqueeze(torch.sum(prior[u], dim=-1), dim=-1).repeat(1, 1, 1,
+																							seq_len)).detach()) * temperature
+				prior_loss = my_kl_loss(
+					(prior[u] / torch.unsqueeze(torch.sum(prior[u], dim=-1), dim=-1).repeat(1, 1, 1,
+																							seq_len)),
+					series[u].detach()) * temperature
+			else:
+				series_loss += my_kl_loss(series[u], (
+						prior[u] / torch.unsqueeze(torch.sum(prior[u], dim=-1), dim=-1).repeat(1, 1, 1,
+																							seq_len)).detach()) * temperature
+				prior_loss += my_kl_loss(
+					(prior[u] / torch.unsqueeze(torch.sum(prior[u], dim=-1), dim=-1).repeat(1, 1, 1,
+																							seq_len)),
+					series[u].detach()) * temperature
+		metric = torch.softmax((-series_loss - prior_loss), dim=-1)
+
+		cri = metric * loss
+		cri = cri.detach().cpu().numpy()
+		attens_energy.append(cri)
+		test_labels.append(labels)
+
+	attens_energy = np.concatenate(attens_energy, axis=0).reshape(-1)
+	return np.array(attens_energy)
