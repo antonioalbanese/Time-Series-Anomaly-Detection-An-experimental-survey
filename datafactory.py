@@ -155,4 +155,4 @@ class MyDataset(Dataset):
             i = idx*self.step
             return torch.tensor(self.data[i:i+self.seq_len], dtype=torch.float).reshape(self.w_size)
         else: 
-            return torch.tensor(self.sequences[idx], dtype = torch.float)
+            return torch.tensor(self.data[i:i+self.seq_len], dtype = torch.float)
