@@ -617,7 +617,6 @@ def testTransformer(model, criterion, thre_loader, seq_len, device):
 		metric = torch.softmax((-series_loss - prior_loss), dim=-1)
 
 		cri = metric * loss
-		print(cri.shape, metric.shape, loss.shape)
 		cri = cri.detach().cpu().numpy()
 		attens_energy.append(np.average(cri))
 
