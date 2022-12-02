@@ -24,7 +24,6 @@ class MyDataset(Dataset):
 
         self.load_data()
 
-
     def load_data(self):
         scaler = MinMaxScaler()
         window_size = self.seq_len
@@ -154,8 +153,12 @@ class MyDataset(Dataset):
     
     def get_sizes(self):
         return self.w_size, self.z_size
+    
     def get_input_output(self):
         return self.n_features, self.n_features
+
+    def get_input_dim(self):
+        return self.n_features
 
     def __len__(self):
         if self.method=="DEEPANT":

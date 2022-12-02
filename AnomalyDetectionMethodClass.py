@@ -12,7 +12,7 @@ from USAD import USADSolver
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader
-from models import DeepAnt, UsadModel
+from models import DeepAnt, UsadModel, TanoLSTMGenerator, TanoLSTMDiscriminator
 from datafactory import MyDataset
 from sklearn.metrics import classification_report
 import json
@@ -23,6 +23,9 @@ from torchinfo import summary
 
 from Transformer.transformer import my_kl_loss, adjust_learning_rate, EarlyStopping
 from Transformer.model.AnomalyTransformer import AnomalyTransformer
+
+from torch.autograd import Variable
+import torch.nn.init as init
 
 import wandb
 
@@ -136,6 +139,16 @@ class ADMethod():
                                         e_layers=3).to(self.device)
 			self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config['LR'])
 			self.criterion = nn.MSELoss()
+			self.real_label = 1
+			self.fake_label = 0
+		
+		if self.name == 'TANOGAN':
+			self.input_dim = self.train_ds.get_input_dim()
+			self.netD = TanoLSTMDiscriminator(in_dim=self.input_dim, device=self.device).to(self.device)
+			self.netG = TanoLSTMGenerator(in_dim=self.input_dim, out_dim=self.input_dim, device=device).to(self.device)
+			self.optimizerD = torch.optim.Adam(self.netD.parameters(), lr=self.config['LR'])
+			self.optimizerG = torch.optim.Adam(self.netG.parameters(), lr=self.config['LR'])
+			self.criterion = nn.BCELoss().to(device)
 			
 
 		end_time = time.time()
@@ -222,6 +235,32 @@ class ADMethod():
 			train_history['TRAIN_LOSSES_1'] = np.array(train_losses1)
 			train_history['TRAIN_LOSSES_2'] = np.array(train_losses2)
 			adjust_learning_rate(self.optimizer, epoch + 1, self.config['LR'])
+		if self.name == "TANOGAN":
+			train_lossesD = []
+			train_lossesG = []
+			self.netD.to(self.device)
+			self.netG.to(self.device)
+			self.netD.train()
+			self.netG.train()
+			for epoch in range(self.config['EPOCHS']):
+				epoch_lossD, epoch_lossG = TanoEpoch(self.netD, self.netG, self.optimizerD, self.optimizerG, self.criterion)
+
+				if self.config['LOGGER']:
+					wandb.define_metric("epoch")
+					wandb.define_metric("lossD", step_metric="epoch")
+					wandb.define_metric("lossG", step_metric="epoch")
+					wandb.log({
+						"epoch": epoch,
+						"lossD": epoch_lossD,
+						"lossG": epoch_lossG
+					})
+				if self.config['VERBOSE']:
+					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss_D:{epoch_lossD:.5f}. train_loss_G:{epoch_lossG:.5f}")
+				train_lossesD.append([epoch_loss1])
+				train_lossesG.append([epoch_loss2])
+
+			train_history['TRAIN_LOSSES_D'] = np.array(train_lossesD)
+			train_history['TRAIN_LOSSES_G'] = np.array(train_lossesG)
 
 
 		end_time = time.time()
@@ -270,7 +309,6 @@ class ADMethod():
 			# wandb.run.summary.update()
 		
 		return self.predictions, self.scores
-
 
 	def results(self, threshold: float, plot: bool):
 		if self.config['VERBOSE']:
@@ -475,6 +513,8 @@ class ADMethod():
 			# wandb.run.summary.update()
 			wandb.finish()
 
+
+
 def deepAntEpoch(model: DeepAnt, loader: DataLoader, criterion, optimizer, device):
 	curr_loss = 0
 	for idx, (batch, batch_labels) in enumerate(loader):
@@ -499,7 +539,6 @@ def testDeepAnt(model: DeepAnt, loader: DataLoader, criterion, device):
 			predictions.append(output.cpu().numpy())
 			scores.append(score.cpu().item())
 	return predictions, scores
-
 
 def UsadEpoch(model: UsadModel, loader: DataLoader, optimizer1, optimizer2, epoch, device):
 	n = epoch+1
@@ -533,6 +572,51 @@ def UsadEpoch(model: UsadModel, loader: DataLoader, optimizer1, optimizer2, epoc
 		optimizer2.zero_grad()
 
 	return curr_loss1/len(loader), curr_loss2/len(loader)
+
+def TanoEpoch(netD, netG, optimizerD, optimizerG, criterion, device):
+	real_label = 1
+	fake_label = 0
+	lossesD = []
+	lossesG = []
+	for i, (x,y) in enumerate(dataloader, 0):
+		netD.zero_grad()
+		real = x.to(device)
+		batch_size, seq_len = real.size(0), real.size(1)
+		label = torch.full((batch_size, seq_len, 1), real_label, device=device)
+		
+		output,_ = netD.forward(real)
+		errD_real = criterion(output, label.float())
+		errD_real.backward()
+		optimizerD.step()
+		D_x = output.mean().item()
+        
+        #Train with fake data
+		noise = Variable(init.normal(torch.Tensor(batch_size,seq_len,in_dim),mean=0,std=0.1)).cuda()
+		fake,_ = netG.forward(noise)
+		output,_ = netD.forward(fake.detach()) # detach causes gradient is no longer being computed or stored to save memeory
+		label.fill_(fake_label)
+		errD_fake = criterion(output, label.float())
+		errD_fake.backward()
+		D_G_z1 = output.mean().item()
+		errD = errD_real + errD_fake
+		optimizerD.step()
+        
+        ############################
+        # (2) Update G network: maximize log(D(G(z)))
+        ###########################
+		netG.zero_grad()
+		noise = Variable(init.normal(torch.Tensor(batch_size,seq_len,in_dim),mean=0,std=0.1)).cuda()
+		fake,_ = netG.forward(noise)
+		label.fill_(real_label) 
+		output,_ = netD.forward(fake)
+		errG = criterion(output, label.float())
+		errG.backward()
+		optimizerG.step()
+		D_G_z2 = output.mean().item()
+
+	lossD = torch.mean(lossesD)
+	lossG = torch.mean(lossesG)
+	return lossD, lossG
 
 def testUsad(model: UsadModel, loader: DataLoader, device, alpha = 0.5, beta=0.5):
 	with torch.no_grad():
@@ -622,3 +706,7 @@ def testTransformer(model, criterion, thre_loader, seq_len, device):
 
 	#attens_energy = np.concatenate(attens_energy, axis=0).reshape(-1)
 	return np.array(attens_energy)
+
+
+
+
