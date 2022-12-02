@@ -589,7 +589,7 @@ def TransformerEpoch(model, criterion, optimizer, train_loader, K, seq_len, devi
 def testTransformer(model, thre_loader, seq_len, device):
 	temperature = 50
 	attens_energy = []
-	for i, (input_data, labels) in enumerate(thre_loader):
+	for i, input_data in enumerate(thre_loader):
 		input = input_data.float().to(device)
 		output, series, prior, _ = model(input)
 
