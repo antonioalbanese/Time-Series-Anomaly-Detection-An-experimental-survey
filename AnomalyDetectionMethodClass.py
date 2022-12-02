@@ -621,5 +621,5 @@ def testTransformer(model, criterion, thre_loader, seq_len, device):
 		cri = cri.detach().cpu().numpy()
 		attens_energy.append(np.average(cri))
 
-	attens_energy = np.concatenate(attens_energy, axis=0).reshape(-1)
+	#attens_energy = np.concatenate(attens_energy, axis=0).reshape(-1)
 	return np.array(attens_energy)
