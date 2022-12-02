@@ -203,7 +203,7 @@ class ADMethod():
 			self.model.to(self.device)
 			self.model.train()
 			for epoch in range(self.config['EPOCHS']):
-				epoch_loss1, epoch_loss2 = TransformerEpoch( self.criterion, self.optimizer, self.train_dl, self.config['K'], self.config['SEQ_LEN'], self.device)
+				epoch_loss1, epoch_loss2 = TransformerEpoch(self.model, self.criterion, self.optimizer, self.train_dl, self.config['K'], self.config['SEQ_LEN'], self.device)
 				if self.config['LOGGER']:
 					wandb.define_metric("epoch")
 					wandb.define_metric("loss1", step_metric="epoch")
@@ -548,7 +548,7 @@ def testUsad(model: UsadModel, loader: DataLoader, device, alpha = 0.5, beta=0.5
 		
 	return r
 
-def TransformerEpoch(criterion, optimizer, train_loader, K, seq_len, device):
+def TransformerEpoch(model, criterion, optimizer, train_loader, K, seq_len, device):
 	loss1_list = []
 	loss2_list = []
 	for i, input_data in enumerate(train_loader):
