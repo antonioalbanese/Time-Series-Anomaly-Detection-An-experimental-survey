@@ -256,7 +256,7 @@ class ADMethod():
 				self.predictions = None 
 				self.model.eval()
 				self.model.to(self.device)
-				self.scores = testTransformer(self.model, self.test_dl, self.config['SEQ_LEN'], self.device)
+				self.scores = testTransformer(self.model, self.criterion, self.test_dl, self.config['SEQ_LEN'], self.device)
 
 
 
@@ -586,7 +586,7 @@ def TransformerEpoch(model, criterion, optimizer, train_loader, K, seq_len, devi
 
 		return np.average(loss1_list), np.average(loss2_list)
 
-def testTransformer(model, thre_loader, seq_len, device):
+def testTransformer(model, criterion, thre_loader, seq_len, device):
 	temperature = 50
 	attens_energy = []
 	for i, input_data in enumerate(thre_loader):
