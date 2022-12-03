@@ -592,7 +592,7 @@ def TanoEpoch(netD, netG, dataloader, optimizerD, optimizerG, criterion, device)
 	fake_label = 0
 	lossesD = []
 	lossesG = []
-	for i, (x,y) in enumerate(dataloader, 0):
+	for i, x in enumerate(dataloader, 0):
 		netD.zero_grad()
 		real = x.to(device)
 		batch_size, seq_len = real.size(0), real.size(1)
