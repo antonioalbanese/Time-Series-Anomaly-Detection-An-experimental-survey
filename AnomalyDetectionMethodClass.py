@@ -156,7 +156,13 @@ class ADMethod():
 		if self.config['VERBOSE']:
 			print(f"Data preprocessing and method configuration finished in {elapsed} sec.")
 			print("Model summary: ")
-			print(summary(self.model))
+			if self.name == "TANOGAN":
+				print("Generator: ")
+				print(summary(self.netG))
+				print("Discriminator: ")
+				print(summary(self.netD))
+			else:
+				print(summary(self.model))
 		if self.config['LOGGER']:
 			wandb.run.summary['init_time'] = elapsed
 			
