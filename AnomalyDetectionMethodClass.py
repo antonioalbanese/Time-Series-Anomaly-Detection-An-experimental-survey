@@ -297,6 +297,14 @@ class ADMethod():
 				self.model.to(self.device)
 				self.scores = testTransformer(self.model, self.criterion, self.test_dl, self.config['SEQ_LEN'], self.device)
 
+			if self.name == "TANOGAN":
+				self.predictions = None 
+				self.netD.eval()
+				self.netG.eval()
+				self.netD.to(self.device)
+				self.netG.to(self.device)
+				self.scores = testTano(self.netG, self.netD, self.test_dl, self.device)
+
 
 
 		end_time = time.time()
@@ -573,7 +581,7 @@ def UsadEpoch(model: UsadModel, loader: DataLoader, optimizer1, optimizer2, epoc
 
 	return curr_loss1/len(loader), curr_loss2/len(loader)
 
-def TanoEpoch(netD, netG, optimizerD, optimizerG, criterion, device):
+def TanoEpoch(netD, netG, dataloader, optimizerD, optimizerG, criterion, device):
 	real_label = 1
 	fake_label = 0
 	lossesD = []
@@ -707,6 +715,29 @@ def testTransformer(model, criterion, thre_loader, seq_len, device):
 	#attens_energy = np.concatenate(attens_energy, axis=0).reshape(-1)
 	return np.array(attens_energy)
 
+def testTano(generator, discriminator, test_dataloader, device):
+	Lambda = 0.1
+	loss_list = []
+	#y_list = []
+	for i, x in enumerate(test_dataloader):
+		batch_size, seq_len, n_features = real.size(0), real.size(1), real.size(2)
+		z = Variable(init.normal(torch.zeros(batch_size, seq_len, n_features),mean=0,std=0.1),requires_grad=True)
+		z_optimizer = torch.optim.Adam([z],lr=1e-2)
+		loss = None
+		for j in range(50): # set your interation range
+			gen_fake,_ = generator(z.to(device))
+			x = Variable(x).to(device)
+			residual_loss = torch.sum(torch.abs(x-gen_fake))
+			output, x_feature = discriminator(x.to(device))
+			output, G_z_feature = discriminator(gen_fake.to(device)) 
+			discrimination_loss = torch.sum(torch.abs(x_feature-G_z_feature))
+			loss = (1-Lambda)*residual_loss.to(device) + Lambda*discrimination_loss
+			loss.backward()
+			z_optimizer.step()
+
+		loss_list.append(loss.detach().item())
+	
+	return np.array(loss_list)
 
 
 
