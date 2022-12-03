@@ -249,7 +249,7 @@ class ADMethod():
 			self.netD.train()
 			self.netG.train()
 			for epoch in range(self.config['EPOCHS']):
-				epoch_lossD, epoch_lossG = TanoEpoch(self.netD, self.netG, self.optimizerD, self.optimizerG, self.criterion)
+				epoch_lossD, epoch_lossG = TanoEpoch(self.netD, self.netG, self.train_dl, self.optimizerD, self.optimizerG, self.criterion, self.device)
 
 				if self.config['LOGGER']:
 					wandb.define_metric("epoch")
