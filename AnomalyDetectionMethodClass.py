@@ -145,7 +145,7 @@ class ADMethod():
 		if self.name == 'TANOGAN':
 			self.input_dim = self.train_ds.get_input_dim()
 			self.netD = TanoLSTMDiscriminator(in_dim=self.input_dim, device=self.device).to(self.device)
-			self.netG = TanoLSTMGenerator(in_dim=self.input_dim, out_dim=self.input_dim, device=device).to(self.device)
+			self.netG = TanoLSTMGenerator(in_dim=self.input_dim, out_dim=self.input_dim, device=self.device).to(self.device)
 			self.optimizerD = torch.optim.Adam(self.netD.parameters(), lr=self.config['LR'])
 			self.optimizerG = torch.optim.Adam(self.netG.parameters(), lr=self.config['LR'])
 			self.criterion = nn.BCELoss().to(device)
