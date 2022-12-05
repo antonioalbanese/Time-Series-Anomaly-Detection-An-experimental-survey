@@ -282,34 +282,34 @@ class ADMethod():
 			print("=====================================================================")
 			print("Testing...")
 		start_time = time.time()
-			### Calling testing function based on the model selected
-			if self.name == "DEEPANT":
-				with torch.no_grad():
-					self.model.eval()
-					self.model.to(self.device)
-					self.predictions, self.scores = testDeepAnt(self.model, self.test_dl, self.criterion, self.device)
-			
-			if self.name == "USAD":
-				with torch.no_grad():
-					self.predictions = None #USAD does not return predictions, only returns anomaly scores
-					self.model.eval()
-					self.model.to(self.device)
-					self.scores = testUsad(self.model, self.test_dl, self.device)
-			
-			if self.name == "TRANSFORMER":
-				with torch.no_grad():
-					self.predictions = None 
-					self.model.eval()
-					self.model.to(self.device)
-					self.scores = testTransformer(self.model, self.criterion, self.test_dl, self.config['SEQ_LEN'], self.device)
-
-			if self.name == "TANOGAN":
+		### Calling testing function based on the model selected
+		if self.name == "DEEPANT":
+			with torch.no_grad():
+				self.model.eval()
+				self.model.to(self.device)
+				self.predictions, self.scores = testDeepAnt(self.model, self.test_dl, self.criterion, self.device)
+		
+		if self.name == "USAD":
+			with torch.no_grad():
+				self.predictions = None #USAD does not return predictions, only returns anomaly scores
+				self.model.eval()
+				self.model.to(self.device)
+				self.scores = testUsad(self.model, self.test_dl, self.device)
+		
+		if self.name == "TRANSFORMER":
+			with torch.no_grad():
 				self.predictions = None 
-				self.netD.eval()
-				self.netG.eval()
-				self.netD.to(self.device)
-				self.netG.to(self.device)
-				self.scores = testTano(self.netG, self.netD, self.test_dl, self.device)
+				self.model.eval()
+				self.model.to(self.device)
+				self.scores = testTransformer(self.model, self.criterion, self.test_dl, self.config['SEQ_LEN'], self.device)
+
+		if self.name == "TANOGAN":
+			self.predictions = None 
+			self.netD.eval()
+			self.netG.eval()
+			self.netD.to(self.device)
+			self.netG.to(self.device)
+			self.scores = testTano(self.netG, self.netD, self.test_dl, self.device)
 
 
 
