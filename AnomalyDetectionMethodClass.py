@@ -730,7 +730,7 @@ def testTano(generator, discriminator, test_dataloader, device):
 	loss_list = []
 	#y_list = []
 	for i, x in enumerate(test_dataloader):
-		batch_size, seq_len, n_features = real.size(0), real.size(1), real.size(2)
+		batch_size, seq_len, n_features = x.size(0), x.size(1), x.size(2)
 		z = Variable(init.normal(torch.zeros(batch_size, seq_len, n_features),mean=0,std=0.1),requires_grad=True)
 		z_optimizer = torch.optim.Adam([z],lr=1e-2)
 		loss = None
