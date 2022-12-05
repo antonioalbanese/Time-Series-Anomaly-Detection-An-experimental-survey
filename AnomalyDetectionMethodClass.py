@@ -590,6 +590,8 @@ def TanoEpoch(netD, netG, dataloader, optimizerD, optimizerG, criterion, in_dim,
 	fake_label = 0
 	lossesD = []
 	lossesG = []
+	curr_lossD = 0
+	curr_lossG = 0
 	for i, x in enumerate(dataloader, 0):
 		netD.zero_grad()
 		real = x.to(device)
@@ -611,6 +613,8 @@ def TanoEpoch(netD, netG, dataloader, optimizerD, optimizerG, criterion, in_dim,
 		errD_fake.backward()
 		D_G_z1 = output.mean().item()
 		errD = errD_real + errD_fake
+		lossesD.append(errD.item())
+		curr_lossD += errD.item()
 		optimizerD.step()
         
         ############################
@@ -623,11 +627,13 @@ def TanoEpoch(netD, netG, dataloader, optimizerD, optimizerG, criterion, in_dim,
 		output,_ = netD.forward(fake)
 		errG = criterion(output, label.float())
 		errG.backward()
+		lossesG.append(errG.item())
+		curr_lossG += errG.item()
 		optimizerG.step()
 		D_G_z2 = output.mean().item()
 
-	lossD = torch.mean(lossesD)
-	lossG = torch.mean(lossesG)
+	lossD = curr_lossD/len(dataloader)
+	lossG = curr_lossG/len(dataloader)
 	return lossD, lossG
 
 def testUsad(model: UsadModel, loader: DataLoader, device, alpha = 0.5, beta=0.5):
