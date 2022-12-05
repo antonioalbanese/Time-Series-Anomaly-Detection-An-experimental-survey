@@ -139,8 +139,6 @@ class ADMethod():
                                         e_layers=3).to(self.device)
 			self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config['LR'])
 			self.criterion = nn.MSELoss()
-			self.real_label = 1
-			self.fake_label = 0
 		
 		if self.name == 'TANOGAN':
 			self.input_dim = self.train_ds.get_input_dim()
@@ -249,7 +247,7 @@ class ADMethod():
 			self.netD.train()
 			self.netG.train()
 			for epoch in range(self.config['EPOCHS']):
-				epoch_lossD, epoch_lossG = TanoEpoch(self.netD, self.netG, self.train_dl, self.optimizerD, self.optimizerG, self.criterion, self.device)
+				epoch_lossD, epoch_lossG = TanoEpoch(self.netD, self.netG, self.train_dl, self.optimizerD, self.optimizerG, self.criterion, self.input_dimself.device)
 
 				if self.config['LOGGER']:
 					wandb.define_metric("epoch")
@@ -587,7 +585,7 @@ def UsadEpoch(model: UsadModel, loader: DataLoader, optimizer1, optimizer2, epoc
 
 	return curr_loss1/len(loader), curr_loss2/len(loader)
 
-def TanoEpoch(netD, netG, dataloader, optimizerD, optimizerG, criterion, device):
+def TanoEpoch(netD, netG, dataloader, optimizerD, optimizerG, criterion, in_dim, device):
 	real_label = 1
 	fake_label = 0
 	lossesD = []
@@ -605,7 +603,7 @@ def TanoEpoch(netD, netG, dataloader, optimizerD, optimizerG, criterion, device)
 		D_x = output.mean().item()
         
         #Train with fake data
-		noise = Variable(init.normal(torch.Tensor(batch_size,seq_len,in_dim),mean=0,std=0.1)).cuda()
+		noise = Variable(init.normal(torch.Tensor(batch_size,seq_len,in_dim),mean=0,std=0.1)).to(device)
 		fake,_ = netG.forward(noise)
 		output,_ = netD.forward(fake.detach()) # detach causes gradient is no longer being computed or stored to save memeory
 		label.fill_(fake_label)
@@ -619,7 +617,7 @@ def TanoEpoch(netD, netG, dataloader, optimizerD, optimizerG, criterion, device)
         # (2) Update G network: maximize log(D(G(z)))
         ###########################
 		netG.zero_grad()
-		noise = Variable(init.normal(torch.Tensor(batch_size,seq_len,in_dim),mean=0,std=0.1)).cuda()
+		noise = Variable(init.normal(torch.Tensor(batch_size,seq_len,in_dim),mean=0,std=0.1)).to(device)
 		fake,_ = netG.forward(noise)
 		label.fill_(real_label) 
 		output,_ = netD.forward(fake)
