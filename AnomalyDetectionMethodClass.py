@@ -305,8 +305,8 @@ class ADMethod():
 
 		if self.name == "TANOGAN":
 			self.predictions = None 
-			self.netD.eval()
-			self.netG.eval()
+			# self.netD.eval()
+			# self.netG.eval()
 			self.netD.to(self.device)
 			self.netG.to(self.device)
 			self.scores = testTano(self.netG, self.netD, self.test_dl, self.device)
