@@ -380,7 +380,7 @@ class ADMethod():
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])[:len(self.test_ds)]
 
-		if self.name == "USAD" or self.name == "TRANSFORMER":
+		if self.name == "USAD" or self.name == "TRANSFORMER" or self.name == "TANOGAN":
 			window_size = self.config['SEQ_LEN']
 			step = self.config['STEP']
 			if self.config['DATASET'] == "SWAT":
