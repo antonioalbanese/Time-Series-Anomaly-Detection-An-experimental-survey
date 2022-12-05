@@ -260,8 +260,8 @@ class ADMethod():
 					})
 				if self.config['VERBOSE']:
 					print(f"Epoch {epoch+1}/{self.config['EPOCHS']}: train_loss_D:{epoch_lossD:.5f}. train_loss_G:{epoch_lossG:.5f}")
-				train_lossesD.append([epoch_loss1])
-				train_lossesG.append([epoch_loss2])
+				train_lossesD.append([epoch_lossD])
+				train_lossesG.append([epoch_lossG])
 
 			train_history['TRAIN_LOSSES_D'] = np.array(train_lossesD)
 			train_history['TRAIN_LOSSES_G'] = np.array(train_lossesG)
