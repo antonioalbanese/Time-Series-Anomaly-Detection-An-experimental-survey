@@ -449,7 +449,7 @@ class ADMethod():
 				anomaly_state = False
 			if anomaly_state:
 				pred[i] = 1
-		self.anomalies = pred
+		self.anomalies = pred[:self.ground[0]]
 
 		### obtaining report
 		report = classification_report(self.ground, self.anomalies, output_dict=True)
