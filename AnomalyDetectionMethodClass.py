@@ -92,10 +92,10 @@ class ADMethod():
 			print("=====================================================================")
 			print("Initializing...")
 		if self.config['LOGGER']:
-			wandb.init(project="experimental-survey-AD",
-						entity="michiamoantonio",
-						id="TRAINING___{}_{}-seqlen_{}-step_{}-epochs_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['EPOCHS']),
-						name= "TRAINING___{}_{}-seqlen_{}-step_{}-epochs_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['EPOCHS']),
+			wandb.init(project="experiments",
+						entity="ai4trucks-anomalydetection",
+						id="{}_{}-seqlen_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN']),
+						name= "{}_{}-seqlen_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN']),
 						group="{}".format(name) 
 						)
 			# api = wandb.Api()
@@ -273,6 +273,8 @@ class ADMethod():
 			print(f"Training finished in {total_elapsed:.3f} sec., avg time per epoch: {total_elapsed/self.config['EPOCHS']:.3f} sec.")
 			print("=====================================================================")
 		if self.config['LOGGER']:
+			wandb.log({"total_train_time": total_elapsed,
+						"epoch_train_time": total_elapsed/self.config['EPOCHS']:.3f})
 			wandb.run.summary['training_time'] = total_elapsed
 			# wandb.run.summary.update()
 		return train_history
@@ -463,8 +465,8 @@ class ADMethod():
 		if self.best_accuracy['accuracy'] < report["accuracy"]:
 			self.best_accuracy['accuracy'] = report['accuracy']
 			self.best_accuracy['threshold'] = threshold
-		if self.best_AvgF1['f1-score'] < report["macro avg"]["f1-score"]:
-			self.best_AvgF1['f1-score'] = report["macro avg"]['f1-score']
+		if self.best_AvgF1['f1-score'] < report["weighted avg"]["f1-score"]:
+			self.best_AvgF1['f1-score'] = report["weighted avg"]['f1-score']
 			self.best_AvgF1['threshold'] = threshold
 		if self.best_TrueF1['f1-score'] < report["True"]['f1-score']:
 			self.best_TrueF1['f1-score'] = report["True"]['f1-score']
@@ -506,9 +508,10 @@ class ADMethod():
 				"Recall_Avg":report['macro avg']['recall'],
 				"F1_Avg":report['macro avg']['f1-score']
 			} 
-			fig.write_html(path_to_plotly_html, auto_play = False)
-			table.add_data(wandb.Html(path_to_plotly_html))
-			wandb.log({"figure_{:.2f}".format(threshold): table})
+			if plot:
+				fig.write_html(path_to_plotly_html, auto_play = False)
+				table.add_data(wandb.Html(path_to_plotly_html))
+				wandb.log({"figure_{:.2f}".format(threshold): table})
 			wandb.log(rep_to_log)
 			
 
@@ -526,9 +529,12 @@ class ADMethod():
 			print(f"Best True f1-score is {self.best_TrueF1['f1-score']:.2f} with threshold {self.best_TrueF1['threshold']:.2f}")
 		
 		if self.config['LOGGER']:
-			wandb.run.summary["best_accuracy"] = self.best_accuracy
-			wandb.run.summary["best_AvgF1"] = self.best_AvgF1
-			wandb.run.summary["best_TrueF1"] = self.best_TrueF1
+			wandb.log({"best_accuracy" : self.best_accuracy['accuracy']:.2f,
+					   "best_acc_th": self.best_accuracy['threshold']:.2f})
+			wandb.log({"best_macro_f1" : self.best_AvgF1['f1-score']:.2f,
+					   "best_macrof1_th": self.best_AvgF1['threshold']:.2f})
+			wandb.log({"best_true_f1" : self.best_TrueF1['f1-score']:.2f,
+					   "best_truef1_th": self.best_TrueF1['threshold']:.2f})
 			# wandb.run.summary.update()
 			wandb.finish()
 
