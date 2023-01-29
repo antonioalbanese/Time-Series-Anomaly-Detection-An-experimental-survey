@@ -11,7 +11,7 @@ from AnomalyDetectionMethodClass import ADMethod
 
 method_list = ["DEEPANT", "TANOGAN", "USAD", "TRANSFORMER"]
 
-subprocess.run(["mkdir", "./data"])
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("METHOD")
@@ -30,7 +30,8 @@ parser.add_argument("DOWNLOAD_DS", type=bool, default=False)
 args = parser.parse_args()
 
 if args.DOWNLOAD_DS:
-    if args.DATSET == "SWAT":
+    subprocess.run(["mkdir", "./data"])
+    if args.DATASET == "SWAT":
         subprocess.run(["mkdir", "./data/SWAT"])
         #normal
         subprocess.run(["python", "USAD/gdrivedl.py https://drive.google.com/open?id=1rVJ5ry5GG-ZZi5yI4x9lICB8VhErXwCw data/SWAT"])
