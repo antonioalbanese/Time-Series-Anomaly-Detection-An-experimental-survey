@@ -29,26 +29,26 @@ parser.add_argument("--DOWNLOAD_DS", type=bool, default=False)
 
 args = parser.parse_args()
 
-if args.DOWNLOAD_DS:
-    subprocess.run(["mkdir", "./data"])
-    if args.DATASET == "SWAT":
-        subprocess.run(["mkdir", "./data/SWAT"])
-        #normal
-        subprocess.run(["python", "USAD/gdrivedl.py https://drive.google.com/open?id=1rVJ5ry5GG-ZZi5yI4x9lICB8VhErXwCw data/SWAT"])
-        #anomalies
-        subprocess.run(["python", "USAD/gdrivedl.py https://drive.google.com/open?id=1iDYc0OEmidN712fquOBRFjln90SbpaE7 data/SWAT"])
-    if args.DATASET == "SMD":
-        subprocess.run(["mkdir", "./data/SMD"])
-        subprocess.run(["python", "USAD/gdrivedl.py https://drive.google.com/file/d/18JNYBsaX7tu0Qfgo92nCBCklv471L1xB data/SMD"])
-        with zipfile.ZipFile("./data/SMD/SMD.zip", 'r') as zip_ref:
-            zip_ref.extractall("./data/")
-    if args.DATASET == "MSL":
-        subprocess.run(["mkdir", "./data/MSL"])
-        subprocess.run(["python", "USAD/gdrivedl.py https://drive.google.com/uc?id=1ZCLBU_pKTbsPlcj_LwxZE3IRy6mrlys3 data/MSL"])
-        with zipfile.ZipFile("./data/MSL/MSL.zip", 'r') as zip_ref:
-            zip_ref.extractall("./data/")
-    if args.DATASET == "NAB":
-        pass 
+# if args.DOWNLOAD_DS:
+#    subprocess.run(["mkdir", "./data"])
+#     if args.DATASET == "SWAT":
+#         subprocess.run(["mkdir", "./data/SWAT"])
+#         #normal
+#         subprocess.run(["python", "USAD/gdrivedl.py https://drive.google.com/open?id=1rVJ5ry5GG-ZZi5yI4x9lICB8VhErXwCw data/SWAT"])
+#         #anomalies
+#         subprocess.run(["python", "USAD/gdrivedl.py https://drive.google.com/open?id=1iDYc0OEmidN712fquOBRFjln90SbpaE7 data/SWAT"])
+#     if args.DATASET == "SMD":
+#         subprocess.run(["mkdir", "./data/SMD"])
+#         subprocess.run(["python", "USAD/gdrivedl.py https://drive.google.com/file/d/18JNYBsaX7tu0Qfgo92nCBCklv471L1xB data/SMD"])
+#         with zipfile.ZipFile("./data/SMD/SMD.zip", 'r') as zip_ref:
+#             zip_ref.extractall("./data/")
+#     if args.DATASET == "MSL":
+#         subprocess.run(["mkdir", "./data/MSL"])
+#         subprocess.run(["python", "USAD/gdrivedl.py https://drive.google.com/uc?id=1ZCLBU_pKTbsPlcj_LwxZE3IRy6mrlys3 data/MSL"])
+#         with zipfile.ZipFile("./data/MSL/MSL.zip", 'r') as zip_ref:
+#             zip_ref.extractall("./data/")
+#     if args.DATASET == "NAB":
+#         pass 
 
 random.seed(args.SEED)
 configuration = {
