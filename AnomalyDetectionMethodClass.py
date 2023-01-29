@@ -274,7 +274,7 @@ class ADMethod():
 			print("=====================================================================")
 		if self.config['LOGGER']:
 			wandb.log({"total_train_time": total_elapsed,
-						"epoch_train_time": total_elapsed/self.config['EPOCHS']:.3f})
+						"epoch_train_time": total_elapsed/self.config['EPOCHS']})
 			wandb.run.summary['training_time'] = total_elapsed
 			# wandb.run.summary.update()
 		return train_history
