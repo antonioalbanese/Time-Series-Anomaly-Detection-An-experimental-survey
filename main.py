@@ -60,7 +60,8 @@ configuration = {
     'LR': args.LR,
     'EPOCHS': args.EPOCHS,
     'VERBOSE': args.VERBOSE,
-    'LOGGER': args.LOGGER
+    'LOGGER': args.LOGGER,
+    'K': 3 #for TANO
 }
 
 method = ADMethod(name = args.METHOD, config = configuration)
