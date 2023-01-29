@@ -529,12 +529,12 @@ class ADMethod():
 			print(f"Best True f1-score is {self.best_TrueF1['f1-score']:.2f} with threshold {self.best_TrueF1['threshold']:.2f}")
 		
 		if self.config['LOGGER']:
-			wandb.log({"best_accuracy" : self.best_accuracy['accuracy']:.2f,
-					   "best_acc_th": self.best_accuracy['threshold']:.2f})
-			wandb.log({"best_macro_f1" : self.best_AvgF1['f1-score']:.2f,
-					   "best_macrof1_th": self.best_AvgF1['threshold']:.2f})
-			wandb.log({"best_true_f1" : self.best_TrueF1['f1-score']:.2f,
-					   "best_truef1_th": self.best_TrueF1['threshold']:.2f})
+			wandb.log({"best_accuracy" : self.best_accuracy['accuracy'],
+					   "best_acc_th": self.best_accuracy['threshold']})
+			wandb.log({"best_macro_f1" : self.best_AvgF1['f1-score'],
+					   "best_macrof1_th": self.best_AvgF1['threshold']})
+			wandb.log({"best_true_f1" : self.best_TrueF1['f1-score'],
+					   "best_truef1_th": self.best_TrueF1['threshold']})
 			# wandb.run.summary.update()
 			wandb.finish()
 
