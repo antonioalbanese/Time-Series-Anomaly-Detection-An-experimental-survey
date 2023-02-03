@@ -44,8 +44,7 @@ args = parser.parse_args()
 
 random.seed(args.A_SEED)
 
-match args.D_METHOD:
-  case "TRANSFORMER":
+if args.D_METHOD == "TRANSFORMER":
     configuration = {
       'DATASET': args.C_DATASET,
       'SEQ_LEN': args.B_SEQ_LEN,
@@ -56,7 +55,7 @@ match args.D_METHOD:
       'VERBOSE': False,
       'LOGGER': True
     }
-  case "TANO":
+elif args.D_METHOD == "TANO":
     configuration = {
       'DATASET': args.C_DATASET,
       'SEQ_LEN': args.B_SEQ_LEN,
@@ -68,7 +67,7 @@ match args.D_METHOD:
       'LOGGER': True,
       'K': 3 
     }
-  case "DEEPANT":
+elif args.D_METHOD == "DEEPANT":
     configuration = {
       'DATASET': args.C_DATASET,
       'SEQ_LEN': args.B_SEQ_LEN,
@@ -79,7 +78,7 @@ match args.D_METHOD:
       'VERBOSE': False,
       'LOGGER': True
     }
-  case "USAD":
+elif args.D_METHOD == "USAD":
     configuration = {
       'DATASET': args.C_DATASET,
       'SEQ_LEN': args.B_SEQ_LEN,
@@ -91,8 +90,7 @@ match args.D_METHOD:
       'VERBOSE': False,
       'LOGGER': True
     }
-  case _:
-    sys.exit("D-METHOD must be in [TANO, TRANSOFRMER, DEEPANT, USAD]")
+
 
 
 method = ADMethod(name = args.D_METHOD, config = configuration)
