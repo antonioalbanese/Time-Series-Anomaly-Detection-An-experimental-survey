@@ -68,7 +68,7 @@ elif args.D_METHOD == "TANO":
       'EPOCHS': 30,
       'VERBOSE': False,
       'LOGGER': True,
-      'K': 3 
+      'K': None
     }
 elif args.D_METHOD == "DEEPANT":
     configuration = {
@@ -81,7 +81,7 @@ elif args.D_METHOD == "DEEPANT":
       'EPOCHS': 130,
       'VERBOSE': False,
       'LOGGER': True,
-      'K': 3
+      'K': None
     }
 elif args.D_METHOD == "USAD":
     configuration = {
@@ -94,7 +94,7 @@ elif args.D_METHOD == "USAD":
       'EPOCHS': 30, 
       'VERBOSE': False,
       'LOGGER': True,
-      'K': 3
+      'K': None
     }
 
 
