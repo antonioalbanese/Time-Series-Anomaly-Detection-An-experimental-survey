@@ -14,10 +14,10 @@ method_list = ["DEEPANT", "TANOGAN", "USAD", "TRANSFORMER"]
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--D-METHOD")
-parser.add_argument("--C-DATASET")
-parser.add_argument("--B-SEQ_LEN", type=int)
-parser.add_argument("--A-SEED", type=int)
+parser.add_argument("--D_METHOD")
+parser.add_argument("--C_DATASET")
+parser.add_argument("--B_SEQ_LEN", type=int)
+parser.add_argument("--A_SEED", type=int)
 
 args = parser.parse_args()
 
@@ -42,15 +42,15 @@ args = parser.parse_args()
 #     if args.DATASET == "NAB":
 #         pass 
 
-random.seed(args.1-SEED)
+random.seed(args.A-SEED)
 
 match args.METHOD:
   case "TRANSFORMER":
     configuration = {
-      'DATASET': args.C-DATASET,
-      'SEQ_LEN': args.B-SEQ_LEN,
-      'STEP': args.B-SEQ_LEN,
-      'SEDD':args.A-SEED
+      'DATASET': args.C_DATASET,
+      'SEQ_LEN': args.B_SEQ_LEN,
+      'STEP': args.B_SEQ_LEN,
+      'SEDD':args.A_SEED
       'LR': 0.001,
       'EPOCHS': 20,
       'VERBOSE': False,
@@ -58,10 +58,10 @@ match args.METHOD:
     }
   case "TANO":
     configuration = {
-      'DATASET': args.C-DATASET,
-      'SEQ_LEN': args.B-SEQ_LEN,
-      'STEP': args.B-SEQ_LEN,
-      'SEDD':args.A-SEED
+      'DATASET': args.C_DATASET,
+      'SEQ_LEN': args.B_SEQ_LEN,
+      'STEP': args.B_SEQ_LEN,
+      'SEDD':args.A_SEED
       'LR': 0.0001,
       'EPOCHS': 30,
       'VERBOSE': False,
@@ -70,10 +70,10 @@ match args.METHOD:
     }
   case "DEEPANT":
     configuration = {
-      'DATASET': args.C-DATASET,
-      'SEQ_LEN': args.B-SEQ_LEN,
-      'STEP': args.B-SEQ_LEN,
-      'SEDD':args.A-SEED
+      'DATASET': args.C_DATASET,
+      'SEQ_LEN': args.B_SEQ_LEN,
+      'STEP': args.B_SEQ_LEN,
+      'SEDD':args.A_SEED
       'LR': 0.000001,
       'EPOCHS': 130,
       'VERBOSE': False,
@@ -81,10 +81,10 @@ match args.METHOD:
     }
   case "USAD":
     configuration = {
-      'DATASET': args.C-DATASET,
-      'SEQ_LEN': args.B-SEQ_LEN,
-      'STEP': args.B-SEQ_LEN,
-      'SEDD':args.A-SEED
+      'DATASET': args.C_DATASET,
+      'SEQ_LEN': args.B_SEQ_LEN,
+      'STEP': args.B_SEQ_LEN,
+      'SEDD':args.A_SEED
       'HIDDEN_SIZE': 100, 
       'LR': 0.0001,
       'EPOCHS': 30, 
