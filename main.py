@@ -111,7 +111,7 @@ with open('results.csv', 'a', newline='') as file:
       writer = csv.writer(file)
 
       for th in np.linspace(0,1,10,endpoint=False):
-      rep = method.results(threshold = th, plot = False)
-      method.close_run()
+            rep = method.results(threshold = th, plot = False)
+            method.close_run()
 
-      writer.write([ args.A_SEED, args.B_SEQ_LEN, args.C_DATASET, args.D_METHOD, th, rep["True"]['f1-score'], rep["weighted avg"]["f1-score"], rep["accuracy"], epoch_time])
+            writer.write([ args.A_SEED, args.B_SEQ_LEN, args.C_DATASET, args.D_METHOD, th, rep["True"]['f1-score'], rep["weighted avg"]["f1-score"], rep["accuracy"], epoch_time])
