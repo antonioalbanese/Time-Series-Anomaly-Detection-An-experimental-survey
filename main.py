@@ -100,10 +100,18 @@ elif args.D_METHOD == "USAD":
 
 
 method = ADMethod(name = args.D_METHOD, config = configuration)
-train_losses = method.train()
+train_losses, epoch_time = method.train()
 predictions, score = method.test()
 
+import csv
 
-for th in np.linspace(0,1,10,endpoint=False):
-  rep = method.results(threshold = th, plot = False)
-method.close_run()
+# Open the file in append mode
+with open('results.csv', 'a', newline='') as file:
+    # Create a writer object
+    writer = csv.writer(file)
+
+    for th in np.linspace(0,1,10,endpoint=False):
+    rep = method.results(threshold = th, plot = False)
+    method.close_run()
+
+    writer.write([ args.A_SEED, args.B_SEQ_LEN, args.C_DATASET, args.D_METHOD, th, rep["True"]['f1-score'], rep["weighted avg"]["f1-score"], rep["accuracy"], epoch_time])

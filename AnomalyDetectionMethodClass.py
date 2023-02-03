@@ -276,7 +276,7 @@ class ADMethod():
 						"epoch_train_time": total_elapsed/self.config['EPOCHS']})
 			wandb.run.summary['training_time'] = total_elapsed
 			# wandb.run.summary.update()
-		return train_history
+		return train_history, total_elapsed/self.config['EPOCHS']
 
 	def test(self, alphaUSAD=None, betaUSAD=None):
 		if[self.config['VERBOSE']]:
