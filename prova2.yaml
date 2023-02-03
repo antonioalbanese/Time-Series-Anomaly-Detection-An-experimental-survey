@@ -1,0 +1,12 @@
+program: main.py
+method: grid
+name: prova
+metric: 
+    name: accuracy
+    goal: minimize
+parameters:
+    LR:
+        values: [0.001]
+    
+    
+    
