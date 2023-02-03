@@ -6,15 +6,12 @@ import sklearn
 from sklearn.preprocessing import MinMaxScaler
 
 class MyDataset(Dataset):
-    def __init__(self, dataset: str, data_path: str, seq_len: int, step: int, method: str, mode: str, hidden_size: int):
-        if dataset == 'NAB' and (data_path == "" or data_path == None):
-            sys.exit('When dataset is NAB, data_path must have a path to the dataset to be used')
+    def __init__(self, dataset: str, seq_len: int, step: int, method: str, mode: str, hidden_size: int):
         if method == "USA" and hidden_size == None:
             sys.exit('USAD method need HIDDEN_SIZE as hyperparameter')
         
         self.seq_len = seq_len
         self.dataset = dataset
-        self.data_path = data_path
         self.method = method
         self.mode = mode
         self.step = step
@@ -126,14 +123,14 @@ class MyDataset(Dataset):
             # ### create labels if method is DeepAnt    
             # if self.method == "DEEPANT":
             #     self.labels = data.values[np.arange(step,data.shape[0]-1, step)[:, None]]
-        elif self.dataset == 'NAB':
-            print("NAB DS")
+        elif self.dataset.split("/")[0] == 'NAB':
             """
             NAB DATASET MUST BE IN ./NAB/*datasets*/*file.csv*
             data_path MUST CONTAIN *datasets*/*file.csv* ONLY PART TO LOAD LABELS LATER
             """
+            data_path = self.dataset.split("/")[1] + "/" + self.dataset.split("/")[2]
             ### ! mode IS NOT NEEDED FOR NUMENTA AS WE WILL USE THE SAME DATASET FOR TRAINING AND TEST
-            data = pd.read_csv("./NAB/" + self.data_path)
+            data = pd.read_csv("./NAB/" + data_path)
             data = data.drop(["timestamp"] , axis = 1)
             data = pd.DataFrame(scaler.fit_transform(data.values))
             data = pd.DataFrame(scaler.fit_transform(data.values))

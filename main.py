@@ -14,11 +14,10 @@ method_list = ["DEEPANT", "TANOGAN", "USAD", "TRANSFORMER"]
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--5-METHOD")
-parser.add_argument("--3-DATASET")
-parser.add_argument("--4-NAB_PATH", default="None")
-parser.add_argument("--2-SEQ_LEN", type=int)
-parser.add_argument("--1-SEED", type=int)
+parser.add_argument("--D-METHOD")
+parser.add_argument("--C-DATASET")
+parser.add_argument("--B-SEQ_LEN", type=int)
+parser.add_argument("--A-SEED", type=int)
 
 args = parser.parse_args()
 
@@ -43,15 +42,15 @@ args = parser.parse_args()
 #     if args.DATASET == "NAB":
 #         pass 
 
-random.seed(args.SEED)
+random.seed(args.1-SEED)
 
 match args.METHOD:
   case "TRANSFORMER":
     configuration = {
-      'DATASET': args.DATASET,
-      'DATAPATH': args.NAB_PATH,
-      'SEQ_LEN': args.SEQ_LEN,
-      'STEP': args.SEQ_LEN,
+      'DATASET': args.C-DATASET,
+      'SEQ_LEN': args.B-SEQ_LEN,
+      'STEP': args.B-SEQ_LEN,
+      'SEDD':args.A-SEED
       'LR': 0.001,
       'EPOCHS': 20,
       'VERBOSE': False,
@@ -59,10 +58,10 @@ match args.METHOD:
     }
   case "TANO":
     configuration = {
-      'DATASET': args.DATASET,
-      'DATAPATH': args.NAB_PATH,
-      'SEQ_LEN': args.SEQ_LEN,
-      'STEP': args.SEQ_LEN,
+      'DATASET': args.C-DATASET,
+      'SEQ_LEN': args.B-SEQ_LEN,
+      'STEP': args.B-SEQ_LEN,
+      'SEDD':args.A-SEED
       'LR': 0.0001,
       'EPOCHS': 30,
       'VERBOSE': False,
@@ -71,10 +70,10 @@ match args.METHOD:
     }
   case "DEEPANT":
     configuration = {
-      'DATASET': args.DATASET,
-      'DATAPATH': args.NAB_PATH,
-      'SEQ_LEN': args.SEQ_LEN,
-      'STEP': args.SEQ_LEN,
+      'DATASET': args.C-DATASET,
+      'SEQ_LEN': args.B-SEQ_LEN,
+      'STEP': args.B-SEQ_LEN,
+      'SEDD':args.A-SEED
       'LR': 0.000001,
       'EPOCHS': 130,
       'VERBOSE': False,
@@ -82,10 +81,10 @@ match args.METHOD:
     }
   case "USAD":
     configuration = {
-      'DATASET': args.DATASET,
-      'DATAPATH': args.NAB_PATH,
-      'SEQ_LEN': args.SEQ_LEN,
-      'STEP': args.SEQ_LEN,
+      'DATASET': args.C-DATASET,
+      'SEQ_LEN': args.B-SEQ_LEN,
+      'STEP': args.B-SEQ_LEN,
+      'SEDD':args.A-SEED
       'HIDDEN_SIZE': 100, 
       'LR': 0.0001,
       'EPOCHS': 30, 
@@ -93,10 +92,10 @@ match args.METHOD:
       'LOGGER': True
     }
   case _:
-    sys.exit("METHOD must be in [TANO, TRANSOFRMER, DEEPANT, USAD]")
+    sys.exit("D-METHOD must be in [TANO, TRANSOFRMER, DEEPANT, USAD]")
 
 
-method = ADMethod(name = args.METHOD, config = configuration)
+method = ADMethod(name = args.D-METHOD, config = configuration)
 train_losses = method.train()
 predictions, score = method.test()
 

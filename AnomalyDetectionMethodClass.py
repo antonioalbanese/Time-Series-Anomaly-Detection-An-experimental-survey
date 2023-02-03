@@ -94,8 +94,8 @@ class ADMethod():
 		if self.config['LOGGER']:
 			wandb.init(project="experiments",
 						entity="ai4trucks-anomalydetection",
-						id="{}-seqlen{}_step{}".format(self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP']),
-						name= "{}-seqlen{}_step{}".format(self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP']),
+						id="{}-seqlen{}-seed{}".format(self.config['DATASET'], self.config['SEQ_LEN']),
+						name= "{}-seqlen{}-seed{}".format(self.config['DATASET'], self.config['SEQ_LEN']),
 						group= "{}".format(name))
 			# api = wandb.Api()
 			# self.wandb_run = api.run("michiamoantonio/experimental-survey-AD/" + "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']))
@@ -356,12 +356,13 @@ class ADMethod():
 				ground_truth = np.array([False if el == "Normal" else True for el in ground_truth])
 				ground_windows = ground_truth[np.arange(window_size)[None, :] + np.arange(0,ground_truth.shape[0]-window_size, step)[:, None]]
 				self.ground = np.array([True if el.sum() > 0 else False for el in ground_windows])[:len(self.test_ds)]
-			elif self.config['DATASET'] == "NAB":
+			elif self.config['DATASET'].split("/")[0] == "NAB":
+				data_path = self.config['DATASET'].split("/")[1] + "/" + self.config['DATASET'].split("/")[2]
 				with open("./NAB/combined_windows.json") as FI:
 					j_label = json.load(FI)
 				key = self.config['DATAPATH']
 				windows = j_label[key]
-				df = pd.read_csv("./NAB/" + self.config['DATAPATH'])
+				df = pd.read_csv("./NAB/" + data_path)
 				df['timestamp'] = pd.to_datetime(df['timestamp'])
 				ground_truth = np.zeros(len(df), dtype=bool)
 				for w in windows:

@@ -5,16 +5,14 @@ metric:
     name: best_accuracy
     goal: minimize
 parameters:
-    5-METHOD: 
+    4-METHOD: 
         values: ["TRANSFORMER"]
     3-DATASET: 
-        values: ["NAB"]
-    4-NAB_PATH: 
-        values: ["realAdExchange/exchange-2_cpm_results.csv"]
+        values: ["NAB/realAdExchange/exchange-2_cpm_results.csv", "NAB/realKnownCause/machine_temperature_system_failure.csv"]
     2-SEQ_LEN: 
-        values: [30, 50, 100]
+        values: [30, 50]
     1-SEED: 
-        values: [1,2,3]
+        values: [1,2]
     
     
     
