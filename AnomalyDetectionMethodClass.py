@@ -323,6 +323,15 @@ class ADMethod():
 			wandb.run.summary['test_time'] = total_elapsed
 			# wandb.run.summary.update()
 		
+		wandb.define_metric("threshold")
+		wandb.define_metric("accuracy", step_metric="threshold")
+		wandb.define_metric("Recall_True", step_metric="threshold")
+		wandb.define_metric("Precision_True", step_metric="threshold")
+		wandb.define_metric("F1_True", step_metric="threshold")
+		wandb.define_metric("Precision_Avg", step_metric="threshold")
+		wandb.define_metric("Recall_Avg", step_metric="threshold")
+		wandb.define_metric("F1_Avg", step_metric="threshold")
+		
 		return self.predictions, self.scores
 
 	def results(self, threshold: float, plot: bool):
@@ -335,14 +344,6 @@ class ADMethod():
 			# 			group="{}_{}-seqlen_{}-step_{}-lr_{}".format(self.name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']), 
 			# 			name="RESULTS-th_{}".format(threshold),
 			# 			resume = True)
-			wandb.define_metric("threshold")
-			wandb.define_metric("accuracy", step_metric="threshold")
-			wandb.define_metric("Recall_True", step_metric="threshold")
-			wandb.define_metric("Precision_True", step_metric="threshold")
-			wandb.define_metric("F1_True", step_metric="threshold")
-			wandb.define_metric("Precision_Avg", step_metric="threshold")
-			wandb.define_metric("Recall_Avg", step_metric="threshold")
-			wandb.define_metric("F1_Avg", step_metric="threshold")
 			table = wandb.Table(columns = ["scores-th_{:.2f}".format(threshold)])
 			path_to_plotly_html = "./scores-th_{:.2f}.html".format(threshold)
 

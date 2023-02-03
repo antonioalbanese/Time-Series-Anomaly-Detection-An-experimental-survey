@@ -114,4 +114,4 @@ with open('results.csv', 'a', newline='') as file:
             rep = method.results(threshold = th, plot = False)
             method.close_run()
 
-            writer.writerow([ args.A_SEED, args.B_SEQ_LEN, args.C_DATASET, args.D_METHOD, th, rep["True"]['f1-score'], rep["weighted avg"]["f1-score"], rep["accuracy"], epoch_time])
+            writer.writerow([ args.A_SEED, args.B_SEQ_LEN, args.C_DATASET, args.D_METHOD, th, rep["True"]['f1-score'], rep["weighted avg"]["f1-score"], rep["accuracy"], rep['True']['recall'], rep['True']['precision'], rep['weighted avg']['recall'], rep['weighted avg']['precision'], epoch_time])
