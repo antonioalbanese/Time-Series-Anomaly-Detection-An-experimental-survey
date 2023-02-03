@@ -94,8 +94,8 @@ class ADMethod():
 		if self.config['LOGGER']:
 			wandb.init(project="experiments",
 						entity="ai4trucks-anomalydetection",
-						id="{}-seqlen{}-seed{}".format(self.config['DATASET'], self.config['SEQ_LEN']),
-						name= "{}-seqlen{}-seed{}".format(self.config['DATASET'], self.config['SEQ_LEN']),
+						id="{}-seqlen{}-seed{}".format(self.config['DATASET'], self.config['SEQ_LEN'], self.config['SEED']),
+						name= "{}-seqlen{}-seed{}".format(self.config['DATASET'], self.config['SEQ_LEN'], self.config['SEED']),
 						group= "{}".format(name))
 			# api = wandb.Api()
 			# self.wandb_run = api.run("michiamoantonio/experimental-survey-AD/" + "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']))
