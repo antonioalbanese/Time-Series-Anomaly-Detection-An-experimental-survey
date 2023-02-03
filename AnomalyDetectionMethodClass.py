@@ -99,18 +99,20 @@ class ADMethod():
 						group= "{}".format(name))
 			# api = wandb.Api()
 			# self.wandb_run = api.run("michiamoantonio/experimental-survey-AD/" + "TRAINING___{}_{}-seqlen_{}-step_{}-lr_{}".format(name, self.config['DATASET'], self.config['SEQ_LEN'], self.config['STEP'], self.config['LR']))
-			
-
 		start_time = time.time()
+		if self.config['DATASET'].split("/")[0] == "NAB":
+			data_path = self.config['DATASET'].split("/")[1] + "/" + self.config['DATASET'].split("/")[2]
+		else:
+			data_path = None
 		self.train_ds = MyDataset(dataset=self.config['DATASET'], 
-								  data_path=self.config['DATAPATH'], 
+								  data_path=data_path, 
 								  seq_len= self.config['SEQ_LEN'], 
 								  step=self.config['STEP'], 
 								  method= self.name, 
 								  mode='TRAIN',
 								 hidden_size = self.config['HIDDEN_SIZE'])
 		self.test_ds = MyDataset(dataset=self.config['DATASET'], 
-								 data_path=self.config['DATAPATH'], 
+								 data_path=data_path, 
 								 seq_len= self.config['SEQ_LEN'], 
 								 step=self.config['STEP'], 
 								 method= self.name,
