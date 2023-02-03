@@ -49,7 +49,7 @@ if args.D_METHOD == "TRANSFORMER":
       'DATASET': args.C_DATASET,
       'SEQ_LEN': args.B_SEQ_LEN,
       'STEP': args.B_SEQ_LEN,
-      'SEDD':args.A_SEED
+      'SEDD':args.A_SEED,
       'LR': 0.001,
       'EPOCHS': 20,
       'VERBOSE': False,
@@ -60,7 +60,7 @@ elif args.D_METHOD == "TANO":
       'DATASET': args.C_DATASET,
       'SEQ_LEN': args.B_SEQ_LEN,
       'STEP': args.B_SEQ_LEN,
-      'SEDD':args.A_SEED
+      'SEDD':args.A_SEED,
       'LR': 0.0001,
       'EPOCHS': 30,
       'VERBOSE': False,
@@ -72,7 +72,7 @@ elif args.D_METHOD == "DEEPANT":
       'DATASET': args.C_DATASET,
       'SEQ_LEN': args.B_SEQ_LEN,
       'STEP': args.B_SEQ_LEN,
-      'SEDD':args.A_SEED
+      'SEDD':args.A_SEED,
       'LR': 0.000001,
       'EPOCHS': 130,
       'VERBOSE': False,
@@ -83,7 +83,7 @@ elif args.D_METHOD == "USAD":
       'DATASET': args.C_DATASET,
       'SEQ_LEN': args.B_SEQ_LEN,
       'STEP': args.B_SEQ_LEN,
-      'SEDD':args.A_SEED
+      'SEDD':args.A_SEED,
       'HIDDEN_SIZE': 100, 
       'LR': 0.0001,
       'EPOCHS': 30, 
