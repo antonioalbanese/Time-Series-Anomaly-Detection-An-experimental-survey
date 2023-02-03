@@ -5,30 +5,16 @@ metric:
     name: best_accuracy
     goal: minimize
 parameters:
-    METHOD: 
+    5-METHOD: 
         values: ["TRANSFORMER"]
-    DATASET: 
+    3-DATASET: 
         values: ["NAB"]
-    NAB_PATH: 
+    4-NAB_PATH: 
         values: ["realAdExchange/exchange-2_cpm_results.csv"]
-    SEQ_LEN: 
+    2-SEQ_LEN: 
         values: [30, 50, 100]
-    STEP: 
-        values: [30, 50, 100]
-    LR: 
-        values: [0.0001]
-    EPOCHS: 
-        values: [30]
-    VERBOSE: 
-        values: [False]
-    LOGGER: 
-        values: [False]
-    HIDDEN_SIZE: 
-        values: [100]
-    SEED: 
-        values: [1]
-    DOWNLOAD_DS: 
-        values: [False]
+    1-SEED: 
+        values: [1,2,3]
     
     
     

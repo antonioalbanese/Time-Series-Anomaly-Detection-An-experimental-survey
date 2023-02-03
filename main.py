@@ -14,18 +14,11 @@ method_list = ["DEEPANT", "TANOGAN", "USAD", "TRANSFORMER"]
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--METHOD")
-parser.add_argument("--DATASET")
-parser.add_argument("--NAB_PATH", default="None")
-parser.add_argument("--SEQ_LEN", type=int)
-parser.add_argument("--STEP", type=int)
-parser.add_argument("--LR", type=float)
-parser.add_argument("--EPOCHS", type=int)
-parser.add_argument("--VERBOSE", type=bool, default=False)
-parser.add_argument("--LOGGER", type=bool, default = True)
-parser.add_argument("--HIDDEN_SIZE", type=int, default=None)
-parser.add_argument("--SEED", type=int)
-parser.add_argument("--DOWNLOAD_DS", type=bool, default=False)
+parser.add_argument("--5-METHOD")
+parser.add_argument("--3-DATASET")
+parser.add_argument("--4-NAB_PATH", default="None")
+parser.add_argument("--2-SEQ_LEN", type=int)
+parser.add_argument("--1-SEED", type=int)
 
 args = parser.parse_args()
 
@@ -51,22 +44,63 @@ args = parser.parse_args()
 #         pass 
 
 random.seed(args.SEED)
-configuration = {
-    'DATASET': args.DATASET,
-    'DATAPATH': args.NAB_PATH,
-    'SEQ_LEN': args.SEQ_LEN,
-    'STEP': args.STEP,
-    'HIDDEN_SIZE': args.HIDDEN_SIZE, 
-    'LR': args.LR,
-    'EPOCHS': args.EPOCHS,
-    'VERBOSE': args.VERBOSE,
-    'LOGGER': args.LOGGER,
-    'K': 3 #for TANO
-}
+
+match args.METHOD:
+  case "TRANSFORMER":
+    configuration = {
+      'DATASET': args.DATASET,
+      'DATAPATH': args.NAB_PATH,
+      'SEQ_LEN': args.SEQ_LEN,
+      'STEP': args.SEQ_LEN,
+      'LR': 0.001,
+      'EPOCHS': 20,
+      'VERBOSE': False,
+      'LOGGER': True
+    }
+  case "TANO":
+    configuration = {
+      'DATASET': args.DATASET,
+      'DATAPATH': args.NAB_PATH,
+      'SEQ_LEN': args.SEQ_LEN,
+      'STEP': args.SEQ_LEN,
+      'LR': 0.0001,
+      'EPOCHS': 30,
+      'VERBOSE': False,
+      'LOGGER': True,
+      'K': 3 
+    }
+  case "DEEPANT":
+    configuration = {
+      'DATASET': args.DATASET,
+      'DATAPATH': args.NAB_PATH,
+      'SEQ_LEN': args.SEQ_LEN,
+      'STEP': args.SEQ_LEN,
+      'LR': 0.000001,
+      'EPOCHS': 130,
+      'VERBOSE': False,
+      'LOGGER': True
+    }
+  case "USAD":
+    configuration = {
+      'DATASET': args.DATASET,
+      'DATAPATH': args.NAB_PATH,
+      'SEQ_LEN': args.SEQ_LEN,
+      'STEP': args.SEQ_LEN,
+      'HIDDEN_SIZE': 100, 
+      'LR': 0.0001,
+      'EPOCHS': 30, 
+      'VERBOSE': False,
+      'LOGGER': True
+    }
+  case _:
+    sys.exit("METHOD must be in [TANO, TRANSOFRMER, DEEPANT, USAD]")
+
 
 method = ADMethod(name = args.METHOD, config = configuration)
 train_losses = method.train()
 predictions, score = method.test()
+
+
 for th in np.linspace(0,1,10,endpoint=False):
   rep = method.results(threshold = th, plot = False)
 method.close_run()
