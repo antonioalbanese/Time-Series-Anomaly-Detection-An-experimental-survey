@@ -110,9 +110,7 @@ with open('results.csv', 'a', newline='') as file:
       # Create a writer object
       writer = csv.writer(file)
 
-      for th in np.linspace(0,1,10,endpoint=False):
+      for th in [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
             rep = method.results(threshold = th, plot = False)
-            
-
             writer.writerow([ args.A_SEED, args.B_SEQ_LEN, args.C_DATASET, args.D_METHOD, th, rep["True"]['f1-score'], rep["weighted avg"]["f1-score"], rep["accuracy"], rep['True']['recall'], rep['True']['precision'], rep['weighted avg']['recall'], rep['weighted avg']['precision'], epoch_time])
       method.close_run()
