@@ -44,7 +44,7 @@ args = parser.parse_args()
 
 random.seed(args.A_SEED)
 
-match args.METHOD:
+match args.D_METHOD:
   case "TRANSFORMER":
     configuration = {
       'DATASET': args.C_DATASET,
