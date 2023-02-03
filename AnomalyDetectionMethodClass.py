@@ -105,14 +105,12 @@ class ADMethod():
 		else:
 			data_path = None
 		self.train_ds = MyDataset(dataset=self.config['DATASET'], 
-								  data_path=data_path, 
 								  seq_len= self.config['SEQ_LEN'], 
 								  step=self.config['STEP'], 
 								  method= self.name, 
 								  mode='TRAIN',
 								  hidden_size = self.config['HIDDEN_SIZE'])
 		self.test_ds = MyDataset(dataset=self.config['DATASET'], 
-								 data_path=data_path, 
 								 seq_len= self.config['SEQ_LEN'], 
 								 step=self.config['STEP'], 
 								 method= self.name,
