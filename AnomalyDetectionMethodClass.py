@@ -360,7 +360,7 @@ class ADMethod():
 				data_path = self.config['DATASET'].split("/")[1] + "/" + self.config['DATASET'].split("/")[2]
 				with open("./NAB/combined_windows.json") as FI:
 					j_label = json.load(FI)
-				key = self.config['DATAPATH']
+				key = data_path
 				windows = j_label[key]
 				df = pd.read_csv("./NAB/" + data_path)
 				df['timestamp'] = pd.to_datetime(df['timestamp'])
@@ -396,7 +396,7 @@ class ADMethod():
 				data_path = self.config['DATASET'].split("/")[1] + "/" + self.config['DATASET'].split("/")[2]
 				with open("./NAB/combined_windows.json") as FI:
 					j_label = json.load(FI)
-				key = self.config['DATAPATH']
+				key = data_path
 				windows = j_label[key]
 				df = pd.read_csv("./NAB/" + data_path)
 				df['timestamp'] = pd.to_datetime(df['timestamp'])
