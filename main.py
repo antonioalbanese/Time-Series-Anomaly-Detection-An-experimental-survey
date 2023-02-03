@@ -55,7 +55,7 @@ if args.D_METHOD == "TRANSFORMER":
       'EPOCHS': 20,
       'VERBOSE': False,
       'LOGGER': True,
-      'K': None
+      'K': 3
     }
 elif args.D_METHOD == "TANO":
     configuration = {
@@ -81,7 +81,7 @@ elif args.D_METHOD == "DEEPANT":
       'EPOCHS': 130,
       'VERBOSE': False,
       'LOGGER': True,
-      'K': None
+      'K': 3
     }
 elif args.D_METHOD == "USAD":
     configuration = {
@@ -94,7 +94,7 @@ elif args.D_METHOD == "USAD":
       'EPOCHS': 30, 
       'VERBOSE': False,
       'LOGGER': True,
-      'K': None
+      'K': 3
     }
 
 
