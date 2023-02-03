@@ -42,7 +42,7 @@ args = parser.parse_args()
 #     if args.DATASET == "NAB":
 #         pass 
 
-random.seed(args.A-SEED)
+random.seed(args.A_SEED)
 
 match args.METHOD:
   case "TRANSFORMER":
@@ -95,7 +95,7 @@ match args.METHOD:
     sys.exit("D-METHOD must be in [TANO, TRANSOFRMER, DEEPANT, USAD]")
 
 
-method = ADMethod(name = args.D-METHOD, config = configuration)
+method = ADMethod(name = args.D_METHOD, config = configuration)
 train_losses = method.train()
 predictions, score = method.test()
 
