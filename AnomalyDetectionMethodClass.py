@@ -110,7 +110,7 @@ class ADMethod():
 								  step=self.config['STEP'], 
 								  method= self.name, 
 								  mode='TRAIN',
-								 hidden_size = self.config['HIDDEN_SIZE'])
+								  hidden_size = self.config['HIDDEN_SIZE'])
 		self.test_ds = MyDataset(dataset=self.config['DATASET'], 
 								 data_path=data_path, 
 								 seq_len= self.config['SEQ_LEN'], 
