@@ -57,7 +57,7 @@ if args.D_METHOD == "TRANSFORMER":
       'LOGGER': True,
       'K': 3
     }
-elif args.D_METHOD == "TANO":
+elif args.D_METHOD == "TANOGAN":
     configuration = {
       'DATASET': args.C_DATASET,
       'SEQ_LEN': args.B_SEQ_LEN,
