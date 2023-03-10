@@ -323,14 +323,14 @@ class ADMethod():
 			wandb.run.summary['test_time'] = total_elapsed
 			# wandb.run.summary.update()
 		
-		wandb.define_metric("threshold")
-		wandb.define_metric("accuracy", step_metric="threshold")
-		wandb.define_metric("Recall_True", step_metric="threshold")
-		wandb.define_metric("Precision_True", step_metric="threshold")
-		wandb.define_metric("F1_True", step_metric="threshold")
-		wandb.define_metric("Precision_Avg", step_metric="threshold")
-		wandb.define_metric("Recall_Avg", step_metric="threshold")
-		wandb.define_metric("F1_Avg", step_metric="threshold")
+			wandb.define_metric("threshold")
+			wandb.define_metric("accuracy", step_metric="threshold")
+			wandb.define_metric("Recall_True", step_metric="threshold")
+			wandb.define_metric("Precision_True", step_metric="threshold")
+			wandb.define_metric("F1_True", step_metric="threshold")
+			wandb.define_metric("Precision_Avg", step_metric="threshold")
+			wandb.define_metric("Recall_Avg", step_metric="threshold")
+			wandb.define_metric("F1_Avg", step_metric="threshold")
 		
 		return self.predictions, self.scores
 
