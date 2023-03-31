@@ -423,6 +423,7 @@ class ADMethod():
 		#scalind and computing anomalies
 		scaler = MinMaxScaler()
 		s = scaler.fit_transform(np.array(self.scores).reshape(-1, 1))
+		self.scores = s
 		self.anomalies = np.array([True if el > threshold else False for el in s])
 
 
